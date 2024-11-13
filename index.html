@@ -9,29 +9,32 @@
         /* Style général */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9; /* Couleur de fond douce */
-            color: #333; /* Couleur de texte */
+            background: linear-gradient(135deg, #f5f758, #3eb4a3, #f59b9e); /* Fond dégradé inspiré du logo */
+            color: #333;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         /* Style du titre principal */
         h1 {
-            font-size: 2em;
-            color: #4a90e2; /* Couleur du titre */
+            font-size: 2.5em;
+            color: #4a90e2;
             margin-top: 20px;
+            color: #333; /* Couleur sombre pour contraster avec le fond */
             text-align: center;
+            text-shadow: 1px 1px 2px #f5f758; /* Ombre légère pour ressortir */
         }
 
         /* Style des sections */
         #inventorySection, #addSection {
             display: block;
             background-color: #ffffff; /* Fond blanc pour contraste */
-            border-radius: 10px; /* Bordures arrondies */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            border-radius: 15px; /* Bordures arrondies */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Ombre plus marquée */
             padding: 20px;
             margin-top: 20px;
             width: 90%;
@@ -43,19 +46,19 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #fafafa; /* Couleur de fond douce */
+            background-color: #f5f758; /* Couleur jaune inspirée du logo */
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Style des boutons d'incrémentation et de décrémentation */
+        /* Style des boutons */
         button {
-            background-color: #4a90e2; /* Couleur principale */
-            color: #fff; /* Texte blanc */
+            background-color: #3eb4a3; /* Couleur verte inspirée du logo */
+            color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 5px 10px;
             font-size: 0.9em;
             cursor: pointer;
@@ -63,11 +66,11 @@
         }
 
         button:hover {
-            background-color: #357ABD; /* Changement de couleur au survol */
+            background-color: #2e8d83;
         }
 
         button:active {
-            background-color: #2b6ca3; /* Couleur au clic */
+            background-color: #246e67;
         }
 
         /* Champ de quantité */
@@ -91,7 +94,7 @@
             margin-right: 10px;
         }
 
-        /* Style pour le logo en haut à droite */
+        /* Style pour le logo */
         .logo {
             position: fixed;
             top: 10px;
@@ -104,11 +107,11 @@
         /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
-            background-color: #27ae60; /* Couleur verte pour différencier */
+            background-color: #f59b9e; /* Couleur rose inspirée du logo */
         }
 
         #addSection button:hover {
-            background-color: #1e874b; /* Changement de couleur au survol */
+            background-color: #e48286;
         }
     </style>
 </head>
@@ -131,10 +134,14 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadInventory();
+        });
+
         // Fonction pour charger les articles enregistrés dans le Local Storage
         function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
-            inventoryDiv.innerHTML = ''; // Vider la div pour recharger
+            inventoryDiv.innerHTML = '';
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
 
             items.forEach(item => {
@@ -211,7 +218,7 @@
             if (item) {
                 item.quantity += 1;
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
-                document.querySelector(`#${id} .quantity`).value = item.quantity;
+                document.getElementById(id).querySelector('.quantity').value = item.quantity;
             }
         }
 
@@ -222,7 +229,7 @@
             if (item && item.quantity > 0) {
                 item.quantity -= 1;
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
-                document.querySelector(`#${id} .quantity`).value = item.quantity;
+                document.getElementById(id).querySelector('.quantity').value = item.quantity;
             }
         }
 
@@ -246,19 +253,13 @@
             }
         }
 
-        // Fonction pour réinitialiser l'inventaire
-        function resetInventory() {
-            localStorage.removeItem('inventoryItems');
-            loadInventory();
-        }
-
         // Fonction pour supprimer un article
         function removeItem(id) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            const updatedItems = items.filter(item => item.id !== id); // Filtrer l'article à supprimer
-            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems)); // Mettre à jour le Local Storage
-            loadInventory(); // Recharger l'inventaire pour refléter la suppression
+            const updatedItems = items.filter(item => item.id !== id);
+            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
+            loadInventory();
         }
-
-        // Charger l'inventaire au démarrage
-        loadInventory
+    </script>
+</body>
+</html>
