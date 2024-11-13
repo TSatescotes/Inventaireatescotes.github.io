@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire </title>
+    <title>Inventaire Poplab</title>
     
     <!-- Lien vers le fichier CSS externe -->
     <link rel="stylesheet" href="style.css">
@@ -12,8 +12,7 @@
         body { font-family: Arial, sans-serif; }
         .item { margin-bottom: 15px; }
         .quantity { width: 40px; text-align: center; }
-        #passwordSection { margin-bottom: 20px; }
-        #inventorySection, #addSection { display: none; }
+        #inventorySection, #addSection { display: block; }
 
         /* Styles pour le logo en haut à droite */
         .logo {
@@ -31,50 +30,22 @@
     <!-- Logo en haut à droite -->
     <img src="Images/logo.png" alt="Logo" class="logo" />
 
-    <h1>Inventaire </h1>
+    <h1>Inventaire</h1>
     
-    <!-- Section de mot de passe -->
-    <div id="passwordSection">
-        <h2>Entrez le mot de passe pour accéder à l'inventaire</h2>
-        <input type="password" id="passwordInput" placeholder="Mot de passe">
-        <button onclick="checkPassword()">Valider</button>
-        <p id="errorMessage" style="color: red;"></p>
-    </div>
-
-    <!-- Section inventaire (masquée par défaut) -->
-    <div id="inventorySection" style="display: none;">
-        <h2>Inventaire</h2>
+    <!-- Section inventaire -->
+    <div id="inventorySection">
+        <h2>Inventaire Poplab</h2>
         <div id="inventory"></div>
     </div>
 
-    <!-- Section pour ajouter un nouvel article (masquée par défaut) -->
-    <div id="addSection" style="display: none;">
+    <!-- Section pour ajouter un nouvel article -->
+    <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
         <button onclick="addItem()">Ajouter</button>
-        
     </div>
 
     <script>
-        const PASSWORD = "1234"; // Définissez ici le mot de passe sécurisé
-
-        // Fonction pour vérifier le mot de passe
-        function checkPassword() {
-            const passwordInput = document.getElementById('passwordInput').value;
-            const errorMessage = document.getElementById('errorMessage');
-
-            if (passwordInput === PASSWORD) {
-                // Afficher les sections de l'inventaire et de l'ajout si le mot de passe est correct
-                document.getElementById('passwordSection').style.display = 'none';
-                document.getElementById('inventorySection').style.display = 'block';
-                document.getElementById('addSection').style.display = 'block';
-                
-                loadInventory(); // Charger l'inventaire
-            } else {
-                errorMessage.textContent = "Mot de passe incorrect. Veuillez réessayer.";
-            }
-        }
-
         // Fonction pour charger les articles enregistrés dans le Local Storage
         function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
@@ -204,6 +175,8 @@
             loadInventory(); // Recharger l'inventaire pour refléter la suppression
         }
 
+        // Charger l'inventaire au démarrage
+        loadInventory();
     </script>
 </body>
 </html>
