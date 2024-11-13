@@ -9,8 +9,8 @@
         /* Style général */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9; /* Couleur de fond douce */
-            color: #333; /* Couleur de texte */
+            background-color: #f4f4f9;
+            color: #333;
             margin: 0;
             padding: 0;
             display: flex;
@@ -21,7 +21,7 @@
         /* Style du titre principal */
         h1 {
             font-size: 2em;
-            color: #4a90e2; /* Couleur du titre */
+            color: #4a90e2;
             margin-top: 20px;
             text-align: center;
         }
@@ -29,9 +29,9 @@
         /* Style des sections */
         #inventorySection, #addSection {
             display: block;
-            background-color: #ffffff; /* Fond blanc pour contraste */
-            border-radius: 10px; /* Bordures arrondies */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
             margin-top: 20px;
             width: 90%;
@@ -43,17 +43,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #fafafa; /* Couleur de fond douce */
+            background-color: #fafafa;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Style des boutons d'incrémentation et de décrémentation */
+        /* Style des boutons */
         button {
-            background-color: #4a90e2; /* Couleur principale */
-            color: #fff; /* Texte blanc */
+            background-color: #4a90e2;
+            color: #fff;
             border: none;
             border-radius: 5px;
             padding: 5px 10px;
@@ -63,11 +63,11 @@
         }
 
         button:hover {
-            background-color: #357ABD; /* Changement de couleur au survol */
+            background-color: #357ABD;
         }
 
         button:active {
-            background-color: #2b6ca3; /* Couleur au clic */
+            background-color: #2b6ca3;
         }
 
         /* Champ de quantité */
@@ -91,7 +91,7 @@
             margin-right: 10px;
         }
 
-        /* Style pour le logo en haut à droite */
+        /* Style pour le logo */
         .logo {
             position: fixed;
             top: 10px;
@@ -104,11 +104,11 @@
         /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
-            background-color: #27ae60; /* Couleur verte pour différencier */
+            background-color: #27ae60;
         }
 
         #addSection button:hover {
-            background-color: #1e874b; /* Changement de couleur au survol */
+            background-color: #1e874b;
         }
     </style>
 </head>
@@ -131,6 +131,10 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadInventory();
+        });
+
         // Fonction pour charger les articles enregistrés dans le Local Storage
         function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
@@ -246,19 +250,13 @@
             }
         }
 
-        // Fonction pour réinitialiser l'inventaire
-        function resetInventory() {
-            localStorage.removeItem('inventoryItems');
-            loadInventory();
-        }
-
         // Fonction pour supprimer un article
         function removeItem(id) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            const updatedItems = items.filter(item => item.id !== id); // Filtrer l'article à supprimer
-            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems)); // Mettre à jour le Local Storage
-            loadInventory(); // Recharger l'inventaire pour refléter la suppression
+            const updatedItems = items.filter(item => item.id !== id);
+            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
+            loadInventory();
         }
-
-        // Charger l'inventaire au démarrage
-        loadInventory
+    </script>
+</body>
+</html>
