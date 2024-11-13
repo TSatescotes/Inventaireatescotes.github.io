@@ -3,8 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventaire </title>
+    
     <!-- Lien vers le fichier CSS externe -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- CSS intégré pour tester si le style s'applique correctement -->
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .item { margin-bottom: 15px; }
+        .quantity { width: 40px; text-align: center; }
+        #passwordSection { margin-bottom: 20px; }
+        #inventorySection, #addSection { display: none; }
+
+        /* Styles pour le logo en haut à droite */
+        .logo {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50px; /* Ajustez la taille du logo selon vos besoins */
+            height: auto;
+            margin: 10px;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
     <!-- Logo en haut à droite -->
