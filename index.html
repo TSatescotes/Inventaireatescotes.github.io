@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventaire</title>
-    <!-- Import Firebase SDK -->
+
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         // Configuration Firebase
         const firebaseConfig = {
@@ -90,7 +91,7 @@
         // Fonction pour incrémenter la quantité
         async function increment(id) {
             const itemRef = doc(db, "inventory", id);
-            const itemSnapshot = await itemRef.get();
+            const itemSnapshot = await getDoc(itemRef);
             if (itemSnapshot.exists()) {
                 await updateDoc(itemRef, {
                     quantity: itemSnapshot.data().quantity + 1
@@ -102,7 +103,7 @@
         // Fonction pour décrémenter la quantité
         async function decrement(id) {
             const itemRef = doc(db, "inventory", id);
-            const itemSnapshot = await itemRef.get();
+            const itemSnapshot = await getDoc(itemRef);
             if (itemSnapshot.exists() && itemSnapshot.data().quantity > 0) {
                 await updateDoc(itemRef, {
                     quantity: itemSnapshot.data().quantity - 1
