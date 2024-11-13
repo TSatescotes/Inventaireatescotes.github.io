@@ -2,17 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire </title>
+    <title>Inventaire sécurisé</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .item { margin-bottom: 15px; }
-        .quantity { width: 40px; text-align: center; }
-        #passwordSection { margin-bottom: 20px; }
-        #inventorySection, #addSection { display: none; }
+        <link rel="stylesheet" href="style.css">
+
     </style>
 </head>
 <body>
-    <h1>Inventaire </h1>
+    <!-- Logo en haut à droite -->
+    <img src="Images/logo.png" alt="Logo" class="logo" />
+
+    <h1>Inventaire Sécurisé</h1>
     
     <!-- Section de mot de passe -->
     <div id="passwordSection">
@@ -34,6 +34,7 @@
         <input type="text" id="newItemName" placeholder="Nom de l'article">
         <button onclick="addItem()">Ajouter</button>
         
+        <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
     </div>
 
     <script>
