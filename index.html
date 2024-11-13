@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventaire</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .item { margin-bottom: 15px; }
+        .quantity { width: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Inventaire</h1>
+    
+    <div id="inventory"></div>
+
+    <h2>Ajouter un nouvel article</h2>
+    <input type="text" id="newItemName" placeholder="Nom de l'article">
+    <button onclick="addItem()">Ajouter</button>
+    
+    <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
+
+    <script>
+        // Fonction pour charger les articles enregistrés dans le Local Storage
+        function loadInventory() {
+            const inventoryDiv = document.getElementById('inventory');
+            inventoryDiv.innerHTML = ''; // Vider la div pour recharger
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+
+            items.forEach(item => {
+                createItemElement(item.id, item.name, item.quantity);
+            });
+        }
+
+        // Fonction pour créer un élément d'article dans l'HTML
+        function createItemElement(id, name, quantity) {
+            const inventoryDiv = document.getElementById('inventory');
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.id = id;
+
+            // Champ de modification de nom
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.value = name;
+            nameInput.onchange = () => updateName(id, nameInput.value);
+            itemDiv.appendChild(nameInput);
+
+            // Boutons + et -
+            const decrementButton = document.createElement('button');
+            decrementButton.textContent = '-';
+            decrementButton.onclick = () => decrement(id);
+            itemDiv.appendChild(decrementButton);
+
+            // Champ de quantité modifiable
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.value = quantity;
+            quantityInput.min = 0;
+            quantityInput.className = 'quantity';
+            quantityInput.onchange = () => updateQuantity(id, quantityInput.value); // Mise à jour de la quantité
+            itemDiv.appendChild(quantityInput);
+
+            const incrementButton = document.createElement('button');
+            incrementButton.textContent = '+';
+            incrementButton.onclick = () => increment(id);
+            itemDiv.appendChild(incrementButton);
+
+            inventoryDiv.appendChild(itemDiv);
+        }
+
+        // Fonction pour ajouter un nouvel article
+        function addItem() {
+            const newItemName = document.getElementById('newItemName').value.trim();
+            if (!newItemName) return; // Ne rien faire si le nom est vide
+
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const newItem = {
+                id: `item${Date.now()}`, // Identifiant unique basé sur le timestamp
+                name: newItemName,
+                quantity: 0
+            };
+            items.push(newItem);
+            localStorage.setItem('inventoryItems', JSON.stringify(items));
+
+            createItemElement(newItem.id, newItem.name, newItem.quantity);
+            document.getElementById('newItemName').value = ''; // Vider le champ de texte
+        }
+
+        // Fonction pour incrémenter la quantité
+        function increment(id) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item) {
+                item.quantity += 1;
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+                document.querySelector(`#${id} .quantity`).value = item.quantity;
+            }
+        }
+
+        // Fonction pour décrémenter la quantité
+        function decrement(id) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item && item.quantity > 0) {
+                item.quantity -= 1;
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+                document.querySelector(`#${id} .quantity`).value = item.quantity;
+            }
+        }
+
+        // Fonction pour mettre à jour le nom de l'article
+        function updateName(id, newName) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item) {
+                item.name = newName;
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+            }
+        }
+
+        // Fonction pour mettre à jour la quantité directement dans le champ de saisie
+        function updateQuantity(id, newQuantity) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item && newQuantity >= 0) { // Vérification que la quantité est positive
+                item.quantity = parseInt(newQuantity);
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+            }
+        }
+
+        // Fonction pour réinitialiser l'inventaire
+        function resetInventory() {
+            localStorage.removeItem('inventoryItems');
+            loadInventory();
+        }
+
+        // Charger l'inventaire au démarrage
+        window.onload = loadInventory;
+    </script>
+</body>
+</html>
