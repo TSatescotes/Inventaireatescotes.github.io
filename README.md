@@ -1,0 +1,1 @@
+# Inventaireatescotes.github.io
