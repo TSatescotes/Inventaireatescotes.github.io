@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventaire sécurisé</title>
-    <style>
-        <link rel="stylesheet" href="style.css">
-
-    </style>
+    <!-- Lien vers le fichier CSS externe -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Logo en haut à droite -->
@@ -22,14 +20,14 @@
         <p id="errorMessage" style="color: red;"></p>
     </div>
 
-    <!-- Section inventaire -->
-    <div id="inventorySection">
+    <!-- Section inventaire (masquée par défaut) -->
+    <div id="inventorySection" style="display: none;">
         <h2>Inventaire</h2>
         <div id="inventory"></div>
     </div>
 
-    <!-- Section pour ajouter un nouvel article -->
-    <div id="addSection">
+    <!-- Section pour ajouter un nouvel article (masquée par défaut) -->
+    <div id="addSection" style="display: none;">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
         <button onclick="addItem()">Ajouter</button>
