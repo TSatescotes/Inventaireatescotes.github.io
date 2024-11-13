@@ -110,13 +110,6 @@
         #addSection button:hover {
             background-color: #1e874b; /* Changement de couleur au survol */
         }
-
-        /* Message d'erreur (si utilisé) */
-        #errorMessage {
-            color: red;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
@@ -264,4 +257,8 @@
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const updatedItems = items.filter(item => item.id !== id); // Filtrer l'article à supprimer
             localStorage.setItem('inventoryItems', JSON.stringify(updatedItems)); // Mettre à jour le Local Storage
-            load
+            loadInventory(); // Recharger l'inventaire pour refléter la suppression
+        }
+
+        // Charger l'inventaire au démarrage
+        loadInventory
