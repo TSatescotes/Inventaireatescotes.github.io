@@ -6,11 +6,11 @@ body { font-family: Arial, sans-serif; }
 
 /* Styles pour le logo en haut à droite */
 .logo {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     width: 50px; /* Ajustez la taille du logo selon vos besoins */
     height: auto;
-    margin: 10px; /* Optionnel : ajoute un peu d'espace autour du logo */
+    margin: 10px; /* Ajoute un espace autour du logo */
+    z-index: 1000; /* Place le logo au-dessus des autres éléments */
 }
-
