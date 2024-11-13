@@ -2,25 +2,61 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire</title>
+    <title>Inventaire sécurisé</title>
     <style>
         body { font-family: Arial, sans-serif; }
         .item { margin-bottom: 15px; }
         .quantity { width: 40px; text-align: center; }
+        #passwordSection { margin-bottom: 20px; }
+        #inventorySection, #addSection { display: none; }
     </style>
 </head>
 <body>
-    <h1>Inventaire</h1>
+    <h1>Inventaire Sécurisé</h1>
     
-    <div id="inventory"></div>
+    <!-- Section de mot de passe -->
+    <div id="passwordSection">
+        <h2>Entrez le mot de passe pour accéder à l'inventaire</h2>
+        <input type="password" id="passwordInput" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="errorMessage" style="color: red;"></p>
+    </div>
 
-    <h2>Ajouter un nouvel article</h2>
-    <input type="text" id="newItemName" placeholder="Nom de l'article">
-    <button onclick="addItem()">Ajouter</button>
-    
-    <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
+    <!-- Section inventaire -->
+    <div id="inventorySection">
+        <h2>Inventaire</h2>
+        <div id="inventory"></div>
+    </div>
+
+    <!-- Section pour ajouter un nouvel article -->
+    <div id="addSection">
+        <h2>Ajouter un nouvel article</h2>
+        <input type="text" id="newItemName" placeholder="Nom de l'article">
+        <button onclick="addItem()">Ajouter</button>
+        
+        <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
+    </div>
 
     <script>
+        const PASSWORD = "1234"; // Définissez ici le mot de passe sécurisé
+
+        // Fonction pour vérifier le mot de passe
+        function checkPassword() {
+            const passwordInput = document.getElementById('passwordInput').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (passwordInput === PASSWORD) {
+                // Afficher les sections de l'inventaire et de l'ajout si le mot de passe est correct
+                document.getElementById('passwordSection').style.display = 'none';
+                document.getElementById('inventorySection').style.display = 'block';
+                document.getElementById('addSection').style.display = 'block';
+                
+                loadInventory(); // Charger l'inventaire
+            } else {
+                errorMessage.textContent = "Mot de passe incorrect. Veuillez réessayer.";
+            }
+        }
+
         // Fonction pour charger les articles enregistrés dans le Local Storage
         function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
@@ -59,7 +95,7 @@
             quantityInput.value = quantity;
             quantityInput.min = 0;
             quantityInput.className = 'quantity';
-            quantityInput.onchange = () => updateQuantity(id, quantityInput.value); // Mise à jour de la quantité
+            quantityInput.onchange = () => updateQuantity(id, quantityInput.value);
             itemDiv.appendChild(quantityInput);
 
             const incrementButton = document.createElement('button');
@@ -73,11 +109,11 @@
         // Fonction pour ajouter un nouvel article
         function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
-            if (!newItemName) return; // Ne rien faire si le nom est vide
+            if (!newItemName) return;
 
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const newItem = {
-                id: `item${Date.now()}`, // Identifiant unique basé sur le timestamp
+                id: `item${Date.now()}`,
                 name: newItemName,
                 quantity: 0
             };
@@ -85,7 +121,7 @@
             localStorage.setItem('inventoryItems', JSON.stringify(items));
 
             createItemElement(newItem.id, newItem.name, newItem.quantity);
-            document.getElementById('newItemName').value = ''; // Vider le champ de texte
+            document.getElementById('newItemName').value = '';
         }
 
         // Fonction pour incrémenter la quantité
@@ -124,7 +160,7 @@
         function updateQuantity(id, newQuantity) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
-            if (item && newQuantity >= 0) { // Vérification que la quantité est positive
+            if (item && newQuantity >= 0) {
                 item.quantity = parseInt(newQuantity);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
             }
@@ -135,9 +171,6 @@
             localStorage.removeItem('inventoryItems');
             loadInventory();
         }
-
-        // Charger l'inventaire au démarrage
-        window.onload = loadInventory;
     </script>
 </body>
 </html>
