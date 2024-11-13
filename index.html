@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire sécurisé</title>
+    <title>Inventaire </title>
     <style>
         body { font-family: Arial, sans-serif; }
         .item { margin-bottom: 15px; }
@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>Inventaire Sécurisé</h1>
+    <h1>Inventaire </h1>
     
     <!-- Section de mot de passe -->
     <div id="passwordSection">
@@ -103,6 +103,12 @@
             incrementButton.onclick = () => increment(id);
             itemDiv.appendChild(incrementButton);
 
+            // Bouton de suppression
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Supprimer';
+            removeButton.onclick = () => removeItem(id);
+            itemDiv.appendChild(removeButton);
+
             inventoryDiv.appendChild(itemDiv);
         }
 
@@ -171,6 +177,15 @@
             localStorage.removeItem('inventoryItems');
             loadInventory();
         }
+
+        // Fonction pour supprimer un article
+        function removeItem(id) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const updatedItems = items.filter(item => item.id !== id); // Filtrer l'article à supprimer
+            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems)); // Mettre à jour le Local Storage
+            loadInventory(); // Recharger l'inventaire pour refléter la suppression
+        }
+
     </script>
 </body>
 </html>
