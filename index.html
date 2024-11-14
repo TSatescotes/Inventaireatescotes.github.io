@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Inventaire Poplab avec Supabase</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Assurez-vous que le script Supabase est bien chargé en premier -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
@@ -23,117 +24,117 @@
     </div>
 
     <script>
-        // Configuration Supabase
-        const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        // Fonction pour charger les articles depuis Supabase
-        async function loadInventory() {
-            const inventoryDiv = document.getElementById('inventory');
-            inventoryDiv.innerHTML = ''; // Réinitialiser l'affichage
-
-            const { data: items, error } = await supabase
-                .from('inventoryItems')
-                .select('*');
-
-            if (error) {
-                console.error("Erreur lors du chargement de l'inventaire :", error);
-                return;
-            }
-
-            items.forEach(item => {
-                createItemElement(item.id, item.name, item.quantity);
-            });
-        }
-
-        // Fonction pour créer l'élément HTML pour chaque article
-        function createItemElement(id, name, quantity) {
-            const inventoryDiv = document.getElementById('inventory');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item';
-            itemDiv.id = id;
-
-            const nameDisplay = document.createElement('span');
-            nameDisplay.textContent = name;
-            itemDiv.appendChild(nameDisplay);
-
-            // Bouton pour diminuer la quantité
-            const decrementButton = document.createElement('button');
-            decrementButton.textContent = '-';
-            decrementButton.onclick = () => updateQuantity(id, -1);
-            itemDiv.appendChild(decrementButton);
-
-            // Affichage de la quantité
-            const quantityDisplay = document.createElement('span');
-            quantityDisplay.textContent = ` ${quantity} `;
-            quantityDisplay.className = 'quantity';
-            itemDiv.appendChild(quantityDisplay);
-
-            // Bouton pour augmenter la quantité
-            const incrementButton = document.createElement('button');
-            incrementButton.textContent = '+';
-            incrementButton.onclick = () => updateQuantity(id, 1);
-            itemDiv.appendChild(incrementButton);
-
-            inventoryDiv.appendChild(itemDiv);
-        }
-
-        // Fonction pour ajouter un nouvel article
-        async function addItem() {
-            const newItemName = document.getElementById('newItemName').value.trim();
-            if (!newItemName) {
-                alert("Veuillez entrer un nom pour l'article.");
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from('inventoryItems')
-                .insert([{ name: newItemName, quantity: 1 }])
-                .select();
-
-            if (error) {
-                console.error("Erreur lors de l'ajout dans Supabase :", error);
-                return;
-            }
-
-            console.log("Article ajouté à Supabase :", data[0]);
-            createItemElement(data[0].id, data[0].name, data[0].quantity);
-            document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
-        }
-
-        // Fonction pour mettre à jour la quantité d'un article
-        async function updateQuantity(id, change) {
-            console.log(`Mise à jour de la quantité pour l'ID ${id} de ${change}`);
-            
-            const { data: currentItem, error: fetchError } = await supabase
-                .from('inventoryItems')
-                .select('quantity')
-                .eq('id', id)
-                .single();
-
-            if (fetchError || !currentItem) {
-                console.error("Erreur lors de la récupération de l'article :", fetchError);
-                return;
-            }
-
-            const newQuantity = Math.max(0, currentItem.quantity + change); // Empêche quantité négative
-
-            const { error: updateError } = await supabase
-                .from('inventoryItems')
-                .update({ quantity: newQuantity })
-                .eq('id', id);
-
-            if (updateError) {
-                console.error("Erreur lors de la mise à jour de la quantité dans Supabase :", updateError);
-                return;
-            }
-
-            loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
-        }
-
-        // Vérifie que le DOM est chargé avant d'attacher l'événement
+        // Initialise Supabase après que le DOM soit chargé
         document.addEventListener("DOMContentLoaded", function() {
+            const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
+            const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+            // Fonction pour charger les articles depuis Supabase
+            async function loadInventory() {
+                const inventoryDiv = document.getElementById('inventory');
+                inventoryDiv.innerHTML = ''; // Réinitialiser l'affichage
+
+                const { data: items, error } = await supabase
+                    .from('inventoryItems')
+                    .select('*');
+
+                if (error) {
+                    console.error("Erreur lors du chargement de l'inventaire :", error);
+                    return;
+                }
+
+                items.forEach(item => {
+                    createItemElement(item.id, item.name, item.quantity);
+                });
+            }
+
+            // Fonction pour créer l'élément HTML pour chaque article
+            function createItemElement(id, name, quantity) {
+                const inventoryDiv = document.getElementById('inventory');
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.id = id;
+
+                const nameDisplay = document.createElement('span');
+                nameDisplay.textContent = name;
+                itemDiv.appendChild(nameDisplay);
+
+                // Bouton pour diminuer la quantité
+                const decrementButton = document.createElement('button');
+                decrementButton.textContent = '-';
+                decrementButton.onclick = () => updateQuantity(id, -1);
+                itemDiv.appendChild(decrementButton);
+
+                // Affichage de la quantité
+                const quantityDisplay = document.createElement('span');
+                quantityDisplay.textContent = ` ${quantity} `;
+                quantityDisplay.className = 'quantity';
+                itemDiv.appendChild(quantityDisplay);
+
+                // Bouton pour augmenter la quantité
+                const incrementButton = document.createElement('button');
+                incrementButton.textContent = '+';
+                incrementButton.onclick = () => updateQuantity(id, 1);
+                itemDiv.appendChild(incrementButton);
+
+                inventoryDiv.appendChild(itemDiv);
+            }
+
+            // Fonction pour ajouter un nouvel article
+            async function addItem() {
+                const newItemName = document.getElementById('newItemName').value.trim();
+                if (!newItemName) {
+                    alert("Veuillez entrer un nom pour l'article.");
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from('inventoryItems')
+                    .insert([{ name: newItemName, quantity: 1 }])
+                    .select();
+
+                if (error) {
+                    console.error("Erreur lors de l'ajout dans Supabase :", error);
+                    return;
+                }
+
+                console.log("Article ajouté à Supabase :", data[0]);
+                createItemElement(data[0].id, data[0].name, data[0].quantity);
+                document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
+            }
+
+            // Fonction pour mettre à jour la quantité d'un article
+            async function updateQuantity(id, change) {
+                console.log(`Mise à jour de la quantité pour l'ID ${id} de ${change}`);
+                
+                const { data: currentItem, error: fetchError } = await supabase
+                    .from('inventoryItems')
+                    .select('quantity')
+                    .eq('id', id)
+                    .single();
+
+                if (fetchError || !currentItem) {
+                    console.error("Erreur lors de la récupération de l'article :", fetchError);
+                    return;
+                }
+
+                const newQuantity = Math.max(0, currentItem.quantity + change); // Empêche quantité négative
+
+                const { error: updateError } = await supabase
+                    .from('inventoryItems')
+                    .update({ quantity: newQuantity })
+                    .eq('id', id);
+
+                if (updateError) {
+                    console.error("Erreur lors de la mise à jour de la quantité dans Supabase :", updateError);
+                    return;
+                }
+
+                loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
+            }
+
+            // Lier l'événement de clic au bouton "Ajouter" une fois le DOM chargé
             document.getElementById("addButton").addEventListener("click", addItem);
             console.log("Événement click lié au bouton 'Ajouter'"); // Vérifie si l'événement est bien lié
             loadInventory(); // Charger l'inventaire au démarrage
