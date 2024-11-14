@@ -88,7 +88,7 @@ input[type="text"] {
     position: fixed;
     top: 10px;
     right: 10px;
-    width: 50px;
+    width: 150px;
     height: auto;
     z-index: 1000;
 }
