@@ -14,14 +14,6 @@
 
     <h1>Inventaire Sécurisé</h1>
     
-    <!-- Section de mot de passe -->
-    <div id="passwordSection">
-        <h2>Entrez le mot de passe pour accéder à l'inventaire</h2>
-        <input type="password" id="passwordInput" placeholder="Mot de passe">
-        <button onclick="checkPassword()">Valider</button>
-        <p id="errorMessage" style="color: red;"></p>
-    </div>
-
     <!-- Section inventaire -->
     <div id="inventorySection">
         <h2>Inventaire</h2>
@@ -38,24 +30,6 @@
     </div>
 
     <script>
-        const PASSWORD = "1234"; // Définissez ici le mot de passe sécurisé
-
-        // Fonction pour vérifier le mot de passe
-        function checkPassword() {
-            const passwordInput = document.getElementById('passwordInput').value;
-            const errorMessage = document.getElementById('errorMessage');
-
-            if (passwordInput === PASSWORD) {
-                // Afficher les sections de l'inventaire et de l'ajout si le mot de passe est correct
-                document.getElementById('passwordSection').style.display = 'none';
-                document.getElementById('inventorySection').style.display = 'block';
-                document.getElementById('addSection').style.display = 'block';
-                
-                loadInventory(); // Charger l'inventaire
-            } else {
-                errorMessage.textContent = "Mot de passe incorrect. Veuillez réessayer.";
-            }
-        }
 
         // Fonction pour charger les articles enregistrés dans le Local Storage
         function loadInventory() {
