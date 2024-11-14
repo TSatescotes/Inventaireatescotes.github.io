@@ -104,7 +104,8 @@
 
         // Fonction pour mettre à jour la quantité d'un article
         async function updateQuantity(id, change) {
-            // Récupère l'article actuel
+            console.log(`Mise à jour de la quantité pour l'ID ${id} de ${change}`);
+            
             const { data: currentItem, error: fetchError } = await supabase
                 .from('inventoryItems')
                 .select('quantity')
@@ -118,7 +119,6 @@
 
             const newQuantity = Math.max(0, currentItem.quantity + change); // Empêche quantité négative
 
-            // Met à jour la quantité dans Supabase
             const { error: updateError } = await supabase
                 .from('inventoryItems')
                 .update({ quantity: newQuantity })
@@ -132,11 +132,12 @@
             loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
         }
 
-        // Associe la fonction d'ajout au bouton "Ajouter"
-        document.getElementById("addButton").addEventListener("click", addItem);
-
-        // Charger l'inventaire au démarrage
-        window.addEventListener("load", loadInventory);
+        // Vérifie que le DOM est chargé avant d'attacher l'événement
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("addButton").addEventListener("click", addItem);
+            console.log("Événement click lié au bouton 'Ajouter'"); // Vérifie si l'événement est bien lié
+            loadInventory(); // Charger l'inventaire au démarrage
+        });
     </script>
 </body>
 </html>
