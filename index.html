@@ -28,7 +28,51 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 
-        // Fonction pour charger l'inventaire depuis Firestore
+    </script>
+
+       
+
+    <!-- CSS pour le style -->
+    <style>
+        /* Style général */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f758, #3eb4a3, #f59b9e);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        /* Style des éléments */
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f5f758;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventaire</h1>
+    <!-- Section inventaire -->
+    <div id="inventorySection">
+        <div id="inventory"></div>
+    </div>
+    <!-- Section pour ajouter un nouvel article -->
+    <div id="addSection">
+        <h2>Ajouter un nouvel article</h2>
+        <input type="text" id="newItemName" placeholder="Nom de l'article">
+        <button onclick="addItem()">Ajouter</button>
+    </div>
+
+    <script>
+         // Fonction pour charger l'inventaire depuis Firestore
         async function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
             inventoryDiv.innerHTML = '';
@@ -138,44 +182,5 @@
         // Charger l'inventaire au chargement de la page
         document.addEventListener("DOMContentLoaded", loadInventory);
     </script>
-
-    <!-- CSS pour le style -->
-    <style>
-        /* Style général */
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f758, #3eb4a3, #f59b9e);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        /* Style des éléments */
-        .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f5f758;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Inventaire</h1>
-    <!-- Section inventaire -->
-    <div id="inventorySection">
-        <div id="inventory"></div>
-    </div>
-    <!-- Section pour ajouter un nouvel article -->
-    <div id="addSection">
-        <h2>Ajouter un nouvel article</h2>
-        <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <button onclick="addItem()">Ajouter</button>
-    </div>
 </body>
 </html>
