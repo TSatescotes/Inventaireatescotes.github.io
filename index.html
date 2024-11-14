@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire Poplab</title>
+    <title>Inventaire Poplab avec Supabase</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
     <h1>Inventaire Poplab</h1>
@@ -21,43 +22,29 @@
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Scripts Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
     <script>
-        // Configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
-            authDomain: "inventaire-poplab.firebaseapp.com",
-            projectId: "inventaire-poplab",
-            storageBucket: "inventaire-poplab.appspot.com",
-            messagingSenderId: "490095435720",
-            appId: "1:490095435720:web:5df23c49d4938e90086afd",
-            measurementId: "G-KSW6LY3WWN"
-        };
+        // Configuration Supabase
+        const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Fonction pour charger les articles depuis Firestore
+        // Fonction pour charger les articles depuis Supabase
         async function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
             inventoryDiv.innerHTML = ''; // Réinitialiser l'affichage
 
-            try {
-                const snapshot = await db.collection("inventoryItems").get();
-                const items = [];
-                snapshot.forEach(doc => {
-                    const item = doc.data();
-                    items.push(item);
-                    createItemElement(item.id, item.name, item.quantity);
-                });
-                // Mettre à jour localStorage pour garder une copie locale
-                localStorage.setItem('inventoryItems', JSON.stringify(items));
-            } catch (error) {
+            const { data: items, error } = await supabase
+                .from('inventoryItems')
+                .select('*');
+
+            if (error) {
                 console.error("Erreur lors du chargement de l'inventaire :", error);
+                return;
             }
+
+            items.forEach(item => {
+                createItemElement(item.id, item.name, item.quantity);
+            });
         }
 
         // Fonction pour créer l'élément HTML pour chaque article
@@ -100,49 +87,49 @@
                 return;
             }
 
-            const newItem = {
-                id: `item${Date.now()}`,
-                name: newItemName,
-                quantity: 1
-            };
+            const { data, error } = await supabase
+                .from('inventoryItems')
+                .insert([{ name: newItemName, quantity: 1 }])
+                .select();
 
-            // Ajouter l'article dans Firestore
-            try {
-                await db.collection("inventoryItems").doc(newItem.id).set(newItem);
-                console.log("Article ajouté à Firestore :", newItem);
-                createItemElement(newItem.id, newItem.name, newItem.quantity);
-            } catch (error) {
-                console.error("Erreur lors de l'ajout dans Firestore :", error);
+            if (error) {
+                console.error("Erreur lors de l'ajout dans Supabase :", error);
+                return;
             }
 
-            // Mettre à jour localStorage
-            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            items.push(newItem);
-            localStorage.setItem('inventoryItems', JSON.stringify(items));
-
+            console.log("Article ajouté à Supabase :", data[0]);
+            createItemElement(data[0].id, data[0].name, data[0].quantity);
             document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
         }
 
         // Fonction pour mettre à jour la quantité d'un article
         async function updateQuantity(id, change) {
-            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            const item = items.find(item => item.id === id);
+            // Récupère l'article actuel
+            const { data: currentItem, error: fetchError } = await supabase
+                .from('inventoryItems')
+                .select('quantity')
+                .eq('id', id)
+                .single();
 
-            if (item) {
-                item.quantity = Math.max(0, item.quantity + change); // Empêche quantité négative
-
-                // Mettre à jour Firestore
-                try {
-                    await db.collection("inventoryItems").doc(id).update({ quantity: item.quantity });
-                    console.log("Quantité mise à jour dans Firestore pour :", id);
-                } catch (error) {
-                    console.error("Erreur lors de la mise à jour de la quantité dans Firestore :", error);
-                }
-
-                // Mettre à jour localStorage et recharger l'inventaire
-                localStorage.setItem('inventoryItems', JSON.stringify(items));
-                loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
+            if (fetchError || !currentItem) {
+                console.error("Erreur lors de la récupération de l'article :", fetchError);
+                return;
             }
+
+            const newQuantity = Math.max(0, currentItem.quantity + change); // Empêche quantité négative
+
+            // Met à jour la quantité dans Supabase
+            const { error: updateError } = await supabase
+                .from('inventoryItems')
+                .update({ quantity: newQuantity })
+                .eq('id', id);
+
+            if (updateError) {
+                console.error("Erreur lors de la mise à jour de la quantité dans Supabase :", updateError);
+                return;
+            }
+
+            loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
         }
 
         // Associe la fonction d'ajout au bouton "Ajouter"
