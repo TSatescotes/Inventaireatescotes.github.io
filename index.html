@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Logo en haut à droite -->
     <h1>Inventaire Poplab</h1>
     
     <!-- Section inventaire -->
@@ -37,17 +36,35 @@
             measurementId: "G-KSW6LY3WWN"
         };
 
-        // Initialiser Firebase
+        // Initialiser Firebase et tester l'initialisation
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function loadInventory() {
-            const inventoryDiv = document.getElementById('inventory');
-            inventoryDiv.innerHTML = '';
-            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            items.forEach(item => {
-                createItemElement(item.id, item.name, item.quantity);
-            });
+        console.log("Firebase initialisé :", firebase.apps.length > 0 ? "Oui" : "Non");
+
+        function addItem() {
+            const newItemName = document.getElementById('newItemName').value.trim();
+            if (!newItemName) {
+                console.error("Le nom de l'article est vide.");
+                return;
+            }
+
+            const newItem = {
+                id: `item${Date.now()}`,
+                name: newItemName,
+                quantity: 1
+            };
+
+            // Ajout à Firestore avec message de débogage
+            db.collection("inventoryItems").doc(newItem.id).set(newItem)
+                .then(() => {
+                    console.log("Article ajouté avec succès à Firestore :", newItem);
+                    createItemElement(newItem.id, newItem.name, newItem.quantity);
+                    document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de l'ajout de l'article dans Firestore :", error);
+                });
         }
 
         function createItemElement(id, name, quantity) {
@@ -63,40 +80,8 @@
             inventoryDiv.appendChild(itemDiv);
         }
 
-        async function addItem() {
-            const newItemName = document.getElementById('newItemName').value.trim();
-            if (!newItemName) {
-                console.error("Le nom de l'article est vide.");
-                return;
-            }
-
-            const newItem = {
-                id: `item${Date.now()}`,
-                name: newItemName,
-                quantity: 1
-            };
-
-            // Ajouter à Firestore
-            try {
-                await db.collection("inventoryItems").doc(newItem.id).set(newItem);
-                console.log("Article ajouté avec succès à Firestore.");
-            } catch (error) {
-                console.error("Erreur lors de l'ajout de l'article dans Firestore :", error);
-                return;
-            }
-
-            // Ajouter à localStorage et afficher
-            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            items.push(newItem);
-            localStorage.setItem('inventoryItems', JSON.stringify(items));
-            createItemElement(newItem.id, newItem.name, newItem.quantity);
-            document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
-        }
-
-        // Attacher l'événement "click" au bouton "Ajouter" lorsque le DOM est prêt
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("addButton").addEventListener("click", addItem);
-            loadInventory(); // Charger l'inventaire au démarrage
         });
     </script>
 </body>
