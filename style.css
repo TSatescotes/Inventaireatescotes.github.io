@@ -1,7 +1,7 @@
 /* Style général */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9; /* Couleur de fond douce */
+    background-color: #f0f7f5; /* Couleur inspirée de fond douce */
     color: #333; /* Couleur de texte */
     margin: 0;
     padding: 0;
@@ -13,17 +13,17 @@ body {
 /* Style du titre principal */
 h1 {
     font-size: 2em;
-    color: #4a90e2; /* Couleur du titre */
+    color: #01b6ad; /* Teal inspired by "À tes Côtés" */
     margin-top: 20px;
     text-align: center;
 }
 
 /* Style des sections */
 #inventorySection, #addSection {
-    display: block; /* Toujours visible */
+    display: block;
     background-color: #ffffff; /* Fond blanc pour contraste */
-    border-radius: 10px; /* Bordures arrondies */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-top: 20px;
     width: 90%;
@@ -35,7 +35,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #fafafa; /* Couleur de fond douce */
+    background-color: #f7fddc; /* Soft yellow inspired by text bubbles */
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 8px;
@@ -44,8 +44,8 @@ h1 {
 
 /* Style des boutons d'incrémentation et de décrémentation */
 button {
-    background-color: #4a90e2; /* Couleur principale */
-    color: #fff; /* Texte blanc */
+    background-color: #fe6f61; /* Bright pink from "Sourire" */
+    color: #fff;
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
@@ -55,11 +55,11 @@ button {
 }
 
 button:hover {
-    background-color: #357ABD; /* Changement de couleur au survol */
+    background-color: #e65548; /* Slightly darker pink on hover */
 }
 
 button:active {
-    background-color: #2b6ca3; /* Couleur au clic */
+    background-color: #d5443a; /* Even darker pink on click */
 }
 
 /* Champ de quantité */
@@ -70,7 +70,7 @@ button:active {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 5px;
-    background-color: #f4f4f4;
+    background-color: #e3f9f5; /* Light teal inspired by logo colors */
 }
 
 /* Champ de texte pour le nom de l'article */
@@ -88,7 +88,7 @@ input[type="text"] {
     position: fixed;
     top: 10px;
     right: 10px;
-    width: 50px; /* Taille réduite du logo */
+    width: 50px;
     height: auto;
     z-index: 1000;
 }
@@ -96,16 +96,16 @@ input[type="text"] {
 /* Style du bouton pour ajouter un nouvel article */
 #addSection button {
     margin-top: 10px;
-    background-color: #27ae60; /* Couleur verte pour différencier */
+    background-color: #3cad5c; /* Green inspired by "Grandir" */
 }
 
 #addSection button:hover {
-    background-color: #1e874b; /* Changement de couleur au survol */
+    background-color: #318a4c; /* Darker green on hover */
 }
 
 /* Message d'erreur (si utilisé) */
 #errorMessage {
-    color: red;
+    color: #e74c3c; /* Red to stand out */
     font-size: 0.9em;
     margin-top: 10px;
 }
