@@ -1,24 +1,23 @@
 /* Style général */
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #00b3a3, #ff62a1, #ffef9a); /* Gradient with teal, pink, and yellow */
+    background: linear-gradient(135deg, #00b3a3, #ff62a1, #ffef9a); /* Gradient avec teal, rose, et jaune */
     color: #333; /* Couleur de texte */
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-attachment: fixed; /* Keeps the gradient fixed on scroll */
+    background-attachment: fixed; /* Garde le gradient fixe lors du scroll */
 }
 
 /* Style du titre principal */
 h1 {
-    font-size: 2em;
-    color: #00b3a3; /* Teal from the "À" bubble */
+    font-size: 3em; /* Augmente la taille du titre */
+    color: #fff; /* Définit la couleur en blanc */
     margin-top: 20px;
     text-align: center;
-    text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff; /* Contour blanc */
-
+    text-shadow: -2px -2px 0 #333, 2px -2px 0 #333, -2px 2px 0 #333, 2px 2px 0 #333; /* Contour sombre pour contraste */
 }
 
 /* Style des sections */
@@ -38,7 +37,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #ffef9a; /* Yellow inspired by the "Côtés" text */
+    background-color: #ffef9a; /* Jaune inspiré du texte "Côtés" */
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 8px;
@@ -47,7 +46,7 @@ h1 {
 
 /* Style des boutons d'incrémentation et de décrémentation */
 button {
-    background-color: #ff62a1; /* Pink from the "Sourire" bubble */
+    background-color: #ff62a1; /* Rose inspiré de la bulle "Sourire" */
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -58,11 +57,11 @@ button {
 }
 
 button:hover {
-    background-color: #e0558b; /* Darker pink for hover effect */
+    background-color: #e0558b; /* Rose plus foncé pour effet hover */
 }
 
 button:active {
-    background-color: #c84a78; /* Even darker pink on click */
+    background-color: #c84a78; /* Rose encore plus foncé au clic */
 }
 
 /* Champ de quantité */
@@ -73,7 +72,7 @@ button:active {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 5px;
-    background-color: #dff0ed; /* Soft teal inspired by the logo's vibe */
+    background-color: #dff0ed; /* Teal doux inspiré de l'ambiance du logo */
 }
 
 /* Champ de texte pour le nom de l'article */
@@ -99,16 +98,16 @@ input[type="text"] {
 /* Style du bouton pour ajouter un nouvel article */
 #addSection button {
     margin-top: 10px;
-    background-color: #00d084; /* Bright green inspired by the "Grandir" bubble */
+    background-color: #00d084; /* Vert vif inspiré de la bulle "Grandir" */
 }
 
 #addSection button:hover {
-    background-color: #00a76d; /* Darker green for hover effect */
+    background-color: #00a76d; /* Vert plus foncé pour effet hover */
 }
 
 /* Message d'erreur (si utilisé) */
 #errorMessage {
-    color: #ff5050; /* Bright red for a noticeable error message */
+    color: #ff5050; /* Rouge vif pour message d'erreur */
     font-size: 0.9em;
     margin-top: 10px;
 }
