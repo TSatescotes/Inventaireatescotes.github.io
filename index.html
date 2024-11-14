@@ -2,10 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire Poplab avec Supabase</title>
+    <title>Inventaire Poplab</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Charger le script Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
     <h1>Inventaire Poplab</h1>
@@ -26,31 +24,15 @@
     <!-- Script principal pour gérer l'inventaire -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Initialiser Supabase
-            const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
-            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
-            const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+            // Stockage local des articles (remplace Supabase)
+            let inventoryItems = [];
 
-            // Fonction pour charger les articles depuis Supabase
-            async function loadInventory() {
+            // Fonction pour charger les articles depuis le stockage local
+            function loadInventory() {
                 const inventoryDiv = document.getElementById('inventory');
                 inventoryDiv.innerHTML = ''; // Réinitialiser l'affichage
 
-                if (!supabase) {
-                    console.error("Supabase n'est pas initialisé correctement.");
-                    return;
-                }
-
-                const { data: items, error } = await supabase
-                    .from('inventoryItems')
-                    .select('*');
-
-                if (error) {
-                    console.error("Erreur lors du chargement de l'inventaire :", error);
-                    return;
-                }
-
-                items.forEach(item => {
+                inventoryItems.forEach(item => {
                     createItemElement(item.id, item.name, item.quantity);
                 });
             }
@@ -88,63 +70,33 @@
             }
 
             // Fonction pour ajouter un nouvel article
-            async function addItem() {
+            function addItem() {
                 const newItemName = document.getElementById('newItemName').value.trim();
                 if (!newItemName) {
                     alert("Veuillez entrer un nom pour l'article.");
                     return;
                 }
 
-                if (!supabase) {
-                    console.error("Supabase n'est pas initialisé correctement.");
-                    return;
-                }
-
-                const { data, error } = await supabase
-                    .from('inventoryItems')
-                    .insert([{ name: newItemName, quantity: 1 }])
-                    .select();
-
-                if (error) {
-                    console.error("Erreur lors de l'ajout dans Supabase :", error);
-                    return;
-                }
-
-                console.log("Article ajouté à Supabase :", data[0]);
-                createItemElement(data[0].id, data[0].name, data[0].quantity);
+                // Création d'un nouvel article et ajout au stockage local
+                const newItem = {
+                    id: Date.now(), // Utilisation de l'horodatage comme identifiant unique
+                    name: newItemName,
+                    quantity: 1
+                };
+                inventoryItems.push(newItem);
+                createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
             }
 
             // Fonction pour mettre à jour la quantité d'un article
-            async function updateQuantity(id, change) {
-                if (!supabase) {
-                    console.error("Supabase n'est pas initialisé correctement.");
+            function updateQuantity(id, change) {
+                const item = inventoryItems.find(item => item.id === id);
+                if (!item) {
+                    console.error("Article non trouvé");
                     return;
                 }
 
-                const { data: currentItem, error: fetchError } = await supabase
-                    .from('inventoryItems')
-                    .select('quantity')
-                    .eq('id', id)
-                    .single();
-
-                if (fetchError || !currentItem) {
-                    console.error("Erreur lors de la récupération de l'article :", fetchError);
-                    return;
-                }
-
-                const newQuantity = Math.max(0, currentItem.quantity + change); // Empêche quantité négative
-
-                const { error: updateError } = await supabase
-                    .from('inventoryItems')
-                    .update({ quantity: newQuantity })
-                    .eq('id', id);
-
-                if (updateError) {
-                    console.error("Erreur lors de la mise à jour de la quantité dans Supabase :", updateError);
-                    return;
-                }
-
+                item.quantity = Math.max(0, item.quantity + change); // Empêche quantité négative
                 loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
             }
 
