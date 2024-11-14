@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <title>Inventaire Poplab avec Supabase</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Charger le script Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- Initialiser Supabase avec les bonnes informations -->
     <script>
-        // Initialiser Supabase avec les bonnes clés
         const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey); // Initialisation de Supabase
     </script>
 </head>
 <body>
@@ -28,8 +29,10 @@
         <button id="addButton">Ajouter</button>
     </div>
 
+    <!-- Script principal pour gérer l'inventaire -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Fonction pour charger les articles depuis Supabase
             async function loadInventory() {
                 const inventoryDiv = document.getElementById('inventory');
                 inventoryDiv.innerHTML = ''; // Réinitialiser l'affichage
@@ -48,6 +51,7 @@
                 });
             }
 
+            // Fonction pour créer l'élément HTML pour chaque article
             function createItemElement(id, name, quantity) {
                 const inventoryDiv = document.getElementById('inventory');
                 const itemDiv = document.createElement('div');
@@ -58,16 +62,19 @@
                 nameDisplay.textContent = name;
                 itemDiv.appendChild(nameDisplay);
 
+                // Bouton pour diminuer la quantité
                 const decrementButton = document.createElement('button');
                 decrementButton.textContent = '-';
                 decrementButton.onclick = () => updateQuantity(id, -1);
                 itemDiv.appendChild(decrementButton);
 
+                // Affichage de la quantité
                 const quantityDisplay = document.createElement('span');
                 quantityDisplay.textContent = ` ${quantity} `;
                 quantityDisplay.className = 'quantity';
                 itemDiv.appendChild(quantityDisplay);
 
+                // Bouton pour augmenter la quantité
                 const incrementButton = document.createElement('button');
                 incrementButton.textContent = '+';
                 incrementButton.onclick = () => updateQuantity(id, 1);
@@ -76,6 +83,7 @@
                 inventoryDiv.appendChild(itemDiv);
             }
 
+            // Fonction pour ajouter un nouvel article
             async function addItem() {
                 const newItemName = document.getElementById('newItemName').value.trim();
                 if (!newItemName) {
@@ -98,6 +106,7 @@
                 document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
             }
 
+            // Fonction pour mettre à jour la quantité d'un article
             async function updateQuantity(id, change) {
                 const { data: currentItem, error: fetchError } = await supabase
                     .from('inventoryItems')
@@ -110,7 +119,7 @@
                     return;
                 }
 
-                const newQuantity = Math.max(0, currentItem.quantity + change); 
+                const newQuantity = Math.max(0, currentItem.quantity + change); // Empêche quantité négative
 
                 const { error: updateError } = await supabase
                     .from('inventoryItems')
@@ -122,11 +131,12 @@
                     return;
                 }
 
-                loadInventory(); 
+                loadInventory(); // Recharge l'inventaire pour mettre à jour l'affichage
             }
 
+            // Lier l'événement de clic au bouton "Ajouter" une fois le DOM chargé
             document.getElementById("addButton").addEventListener("click", addItem);
-            loadInventory();
+            loadInventory(); // Charger l'inventaire au démarrage
         });
     </script>
 </body>
