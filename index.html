@@ -28,7 +28,7 @@
     <!-- Script pour initialiser Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         // Configuration Firebase
         const firebaseConfig = {
@@ -45,8 +45,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Rendre `db` accessible globalement
+        // Exposer les fonctions Firebase globalement
         window.db = db;
+        window.setDoc = setDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
     </script>
 
     <!-- Script global pour les fonctions d'inventaire -->
@@ -112,7 +116,7 @@
             };
 
             try {
-                await setDoc(doc(window.db, "inventoryItems", newItem.id), newItem);
+                await window.setDoc(window.doc(window.db, "inventoryItems", newItem.id), newItem);
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 items.push(newItem);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
@@ -126,7 +130,7 @@
         // Fonction pour supprimer un article
         async function removeItem(id) {
             try {
-                await deleteDoc(doc(window.db, "inventoryItems", id));
+                await window.deleteDoc(window.doc(window.db, "inventoryItems", id));
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 const updatedItems = items.filter(item => item.id !== id);
                 localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
