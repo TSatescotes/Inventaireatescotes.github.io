@@ -7,8 +7,6 @@
 </head>
 <body>
     <!-- Logo en haut à droite -->
-    <img src="Images/logo.png" alt="Logo" class="logo" />
-
     <h1>Inventaire Poplab</h1>
     
     <!-- Section inventaire -->
@@ -24,25 +22,33 @@
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Script Firebase et gestion de l'inventaire -->
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
+    <!-- Script de gestion de l'inventaire -->
     <script>
-        // Configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
-            authDomain: "inventaire-poplab.firebaseapp.com",
-            projectId: "inventaire-poplab",
-            storageBucket: "inventaire-poplab.appspot.com",
-            messagingSenderId: "490095435720",
-            appId: "1:490095435720:web:5df23c49d4938e90086afd",
-            measurementId: "G-KSW6LY3WWN"
-        };
+        // Fonction pour charger les articles depuis le localStorage
+        function loadInventory() {
+            const inventoryDiv = document.getElementById('inventory');
+            inventoryDiv.innerHTML = '';
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            items.forEach(item => {
+                createItemElement(item.id, item.name, item.quantity);
+            });
+        }
 
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Fonction pour créer l'élément HTML de chaque article
+        function createItemElement(id, name, quantity) {
+            const inventoryDiv = document.getElementById('inventory');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.id = id;
 
+            const nameDisplay = document.createElement('span');
+            nameDisplay.textContent = `${name} (Quantité: ${quantity})`;
+            itemDiv.appendChild(nameDisplay);
+
+            inventoryDiv.appendChild(itemDiv);
+        }
+
+        // Fonction pour ajouter un nouvel article
         function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) {
@@ -53,59 +59,21 @@
             const newItem = {
                 id: `item${Date.now()}`,
                 name: newItemName,
-                quantity: 0
+                quantity: 1
             };
 
-            // Ajouter l'élément à Firestore et au localStorage
-            db.collection("inventoryItems").doc(newItem.id).set(newItem)
-                .then(() => {
-                    console.log("Article ajouté avec succès à Firestore.");
-                    const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-                    items.push(newItem);
-                    localStorage.setItem('inventoryItems', JSON.stringify(items));
-                    createItemElement(newItem.id, newItem.name, newItem.quantity);
-                    document.getElementById('newItemName').value = '';
-                })
-                .catch((error) => {
-                    console.error("Erreur lors de l'ajout de l'article :", error);
-                });
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            items.push(newItem);
+            localStorage.setItem('inventoryItems', JSON.stringify(items));
+            createItemElement(newItem.id, newItem.name, newItem.quantity);
+
+            document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
         }
 
-        function createItemElement(id, name, quantity) {
-            const inventoryDiv = document.getElementById('inventory');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item';
-            itemDiv.id = id;
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.value = name;
-            itemDiv.appendChild(nameInput);
-
-            const decrementButton = document.createElement('button');
-            decrementButton.textContent = '-';
-            itemDiv.appendChild(decrementButton);
-
-            const quantityInput = document.createElement('input');
-            quantityInput.type = 'number';
-            quantityInput.value = quantity;
-            quantityInput.min = 0;
-            quantityInput.className = 'quantity';
-            itemDiv.appendChild(quantityInput);
-
-            const incrementButton = document.createElement('button');
-            incrementButton.textContent = '+';
-            itemDiv.appendChild(incrementButton);
-
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Supprimer';
-            itemDiv.appendChild(removeButton);
-
-            inventoryDiv.appendChild(itemDiv);
-        }
-
+        // Attacher l'événement "click" au bouton "Ajouter" lorsque le DOM est prêt
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("addButton").addEventListener("click", addItem);
+            loadInventory(); // Charger l'inventaire au démarrage
         });
     </script>
 </body>
