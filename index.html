@@ -4,14 +4,8 @@
     <meta charset="UTF-8">
     <title>Inventaire Poplab avec Supabase</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Charger le script Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script>
-        // Initialiser Supabase en définissant `supabase` dès le début
-        const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    </script>
+    <!-- Charger le script Supabase en mode "defer" pour garantir son chargement complet avant utilisation -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js" defer></script>
 </head>
 <body>
     <h1>Inventaire Poplab</h1>
@@ -29,9 +23,14 @@
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Script principal pour gérer l'inventaire -->
+    <!-- Script principal pour gérer l'inventaire, avec initialisation de Supabase après chargement -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Initialiser Supabase une fois le script chargé
+            const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
             // Fonction pour charger les articles depuis Supabase
             async function loadInventory() {
                 const inventoryDiv = document.getElementById('inventory');
