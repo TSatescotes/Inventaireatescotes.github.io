@@ -42,8 +42,9 @@
 
         console.log("Firebase initialisé :", firebase.apps.length > 0 ? "Oui" : "Non");
 
+        // Fonction addItem pour ajouter un nouvel article
         function addItem() {
-            console.log("Fonction addItem appelée"); // Vérifier si addItem est exécutée
+            console.log("Bouton 'Ajouter' cliqué - Fonction addItem appelée");
 
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) {
@@ -57,7 +58,7 @@
                 quantity: 1
             };
 
-            // Ajout dans l'interface pour vérifier l'affichage sans Firestore
+            // Ajout dans l'interface pour tester l'affichage
             createItemElement(newItem.id, newItem.name, newItem.quantity);
             document.getElementById('newItemName').value = ''; // Réinitialiser le champ texte
 
@@ -71,6 +72,7 @@
                 });
         }
 
+        // Fonction pour créer un élément visuel pour chaque article
         function createItemElement(id, name, quantity) {
             const inventoryDiv = document.getElementById('inventory');
             const itemDiv = document.createElement('div');
@@ -84,9 +86,8 @@
             inventoryDiv.appendChild(itemDiv);
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("addButton").addEventListener("click", addItem);
-        });
+        // Ajouter directement l'événement "click" au bouton pour le rendre fonctionnel
+        document.getElementById("addButton").onclick = addItem;
     </script>
 </body>
 </html>
