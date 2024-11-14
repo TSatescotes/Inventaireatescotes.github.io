@@ -2,106 +2,94 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire</title>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
-    authDomain: "inventaire-poplab.firebaseapp.com",
-    projectId: "inventaire-poplab",
-    storageBucket: "inventaire-poplab.firebasestorage.app",
-    messagingSenderId: "490095435720",
-    appId: "1:490095435720:web:7ce0713993e42b59086afd",
-    measurementId: "G-19DVTE3W11"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-
-    </script>
-
-       
-
-    <!-- CSS pour le style -->
+    <title>Inventaire sécurisé</title>
     <style>
-        /* Style général */
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f758, #3eb4a3, #f59b9e);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        /* Style des éléments */
-        .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f5f758;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-        }
+        <link rel="stylesheet" href="style.css">
+
     </style>
 </head>
 <body>
-    <h1>Inventaire</h1>
+    <!-- Logo en haut à droite -->
+    <img src="Images/logo.png" alt="Logo" class="logo" />
+
+    <h1>Inventaire Sécurisé</h1>
+    
+    <!-- Section de mot de passe -->
+    <div id="passwordSection">
+        <h2>Entrez le mot de passe pour accéder à l'inventaire</h2>
+        <input type="password" id="passwordInput" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="errorMessage" style="color: red;"></p>
+    </div>
+
     <!-- Section inventaire -->
     <div id="inventorySection">
+        <h2>Inventaire</h2>
         <div id="inventory"></div>
     </div>
+
     <!-- Section pour ajouter un nouvel article -->
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
         <button onclick="addItem()">Ajouter</button>
+        
+        <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
     </div>
 
     <script>
-         // Fonction pour charger l'inventaire depuis Firestore
-        async function loadInventory() {
-            const inventoryDiv = document.getElementById('inventory');
-            inventoryDiv.innerHTML = '';
+        const PASSWORD = "1234"; // Définissez ici le mot de passe sécurisé
 
-            const querySnapshot = await getDocs(collection(db, "inventory"));
-            querySnapshot.forEach((doc) => {
-                const item = doc.data();
-                createItemElement(doc.id, item.name, item.quantity);
+        // Fonction pour vérifier le mot de passe
+        function checkPassword() {
+            const passwordInput = document.getElementById('passwordInput').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (passwordInput === PASSWORD) {
+                // Afficher les sections de l'inventaire et de l'ajout si le mot de passe est correct
+                document.getElementById('passwordSection').style.display = 'none';
+                document.getElementById('inventorySection').style.display = 'block';
+                document.getElementById('addSection').style.display = 'block';
+                
+                loadInventory(); // Charger l'inventaire
+            } else {
+                errorMessage.textContent = "Mot de passe incorrect. Veuillez réessayer.";
+            }
+        }
+
+        // Fonction pour charger les articles enregistrés dans le Local Storage
+        function loadInventory() {
+            const inventoryDiv = document.getElementById('inventory');
+            inventoryDiv.innerHTML = ''; // Vider la div pour recharger
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+
+            items.forEach(item => {
+                createItemElement(item.id, item.name, item.quantity);
             });
         }
 
-        // Fonction pour créer un élément d'article dans le HTML
+        // Fonction pour créer un élément d'article dans l'HTML
         function createItemElement(id, name, quantity) {
             const inventoryDiv = document.getElementById('inventory');
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item';
             itemDiv.id = id;
 
+            // Champ de modification de nom
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.value = name;
             nameInput.onchange = () => updateName(id, nameInput.value);
             itemDiv.appendChild(nameInput);
 
+            // Boutons + et -
             const decrementButton = document.createElement('button');
             decrementButton.textContent = '-';
             decrementButton.onclick = () => decrement(id);
             itemDiv.appendChild(decrementButton);
 
+            // Champ de quantité modifiable
             const quantityInput = document.createElement('input');
             quantityInput.type = 'number';
             quantityInput.value = quantity;
@@ -115,6 +103,7 @@
             incrementButton.onclick = () => increment(id);
             itemDiv.appendChild(incrementButton);
 
+            // Bouton de suppression
             const removeButton = document.createElement('button');
             removeButton.textContent = 'Supprimer';
             removeButton.onclick = () => removeItem(id);
@@ -124,63 +113,79 @@
         }
 
         // Fonction pour ajouter un nouvel article
-        async function addItem() {
+        function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) return;
 
-            await addDoc(collection(db, "inventory"), {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const newItem = {
+                id: `item${Date.now()}`,
                 name: newItemName,
                 quantity: 0
-            });
+            };
+            items.push(newItem);
+            localStorage.setItem('inventoryItems', JSON.stringify(items));
+
+            createItemElement(newItem.id, newItem.name, newItem.quantity);
             document.getElementById('newItemName').value = '';
-            loadInventory();
         }
 
         // Fonction pour incrémenter la quantité
-        async function increment(id) {
-            const itemRef = doc(db, "inventory", id);
-            const itemSnapshot = await getDoc(itemRef);
-            if (itemSnapshot.exists()) {
-                await updateDoc(itemRef, {
-                    quantity: itemSnapshot.data().quantity + 1
-                });
-                loadInventory();
+        function increment(id) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item) {
+                item.quantity += 1;
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+                document.querySelector(`#${id} .quantity`).value = item.quantity;
             }
         }
 
         // Fonction pour décrémenter la quantité
-        async function decrement(id) {
-            const itemRef = doc(db, "inventory", id);
-            const itemSnapshot = await getDoc(itemRef);
-            if (itemSnapshot.exists() && itemSnapshot.data().quantity > 0) {
-                await updateDoc(itemRef, {
-                    quantity: itemSnapshot.data().quantity - 1
-                });
-                loadInventory();
+        function decrement(id) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item && item.quantity > 0) {
+                item.quantity -= 1;
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+                document.querySelector(`#${id} .quantity`).value = item.quantity;
             }
         }
 
         // Fonction pour mettre à jour le nom de l'article
-        async function updateName(id, newName) {
-            const itemRef = doc(db, "inventory", id);
-            await updateDoc(itemRef, { name: newName });
+        function updateName(id, newName) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item) {
+                item.name = newName;
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+            }
         }
 
-        // Fonction pour mettre à jour la quantité directement
-        async function updateQuantity(id, newQuantity) {
-            const itemRef = doc(db, "inventory", id);
-            await updateDoc(itemRef, { quantity: parseInt(newQuantity) });
+        // Fonction pour mettre à jour la quantité directement dans le champ de saisie
+        function updateQuantity(id, newQuantity) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const item = items.find(item => item.id === id);
+            if (item && newQuantity >= 0) {
+                item.quantity = parseInt(newQuantity);
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+            }
         }
 
-        // Fonction pour supprimer un article
-        async function removeItem(id) {
-            const itemRef = doc(db, "inventory", id);
-            await deleteDoc(itemRef);
+        // Fonction pour réinitialiser l'inventaire
+        function resetInventory() {
+            localStorage.removeItem('inventoryItems');
             loadInventory();
         }
 
-        // Charger l'inventaire au chargement de la page
-        document.addEventListener("DOMContentLoaded", loadInventory);
+        // Fonction pour supprimer un article
+        function removeItem(id) {
+            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+            const updatedItems = items.filter(item => item.id !== id); // Filtrer l'article à supprimer
+            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems)); // Mettre à jour le Local Storage
+            loadInventory(); // Recharger l'inventaire pour refléter la suppression
+        }
+
     </script>
 </body>
 </html>
