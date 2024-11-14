@@ -1,19 +1,20 @@
 /* Style général */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f7f5; /* Couleur inspirée de fond douce */
+    background: linear-gradient(135deg, #00b3a3, #ff62a1, #ffef9a); /* Gradient with teal, pink, and yellow */
     color: #333; /* Couleur de texte */
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-attachment: fixed; /* Keeps the gradient fixed on scroll */
 }
 
 /* Style du titre principal */
 h1 {
     font-size: 2em;
-    color: #01b6ad; /* Teal inspired by "À tes Côtés" */
+    color: #00b3a3; /* Teal from the "À" bubble */
     margin-top: 20px;
     text-align: center;
 }
@@ -35,7 +36,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f7fddc; /* Soft yellow inspired by text bubbles */
+    background-color: #ffef9a; /* Yellow inspired by the "Côtés" text */
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 8px;
@@ -44,7 +45,7 @@ h1 {
 
 /* Style des boutons d'incrémentation et de décrémentation */
 button {
-    background-color: #fe6f61; /* Bright pink from "Sourire" */
+    background-color: #ff62a1; /* Pink from the "Sourire" bubble */
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -55,11 +56,11 @@ button {
 }
 
 button:hover {
-    background-color: #e65548; /* Slightly darker pink on hover */
+    background-color: #e0558b; /* Darker pink for hover effect */
 }
 
 button:active {
-    background-color: #d5443a; /* Even darker pink on click */
+    background-color: #c84a78; /* Even darker pink on click */
 }
 
 /* Champ de quantité */
@@ -70,7 +71,7 @@ button:active {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 5px;
-    background-color: #e3f9f5; /* Light teal inspired by logo colors */
+    background-color: #dff0ed; /* Soft teal inspired by the logo's vibe */
 }
 
 /* Champ de texte pour le nom de l'article */
@@ -88,7 +89,7 @@ input[type="text"] {
     position: fixed;
     top: 10px;
     right: 10px;
-    width: 150px;
+    width: 50px;
     height: auto;
     z-index: 1000;
 }
@@ -96,16 +97,16 @@ input[type="text"] {
 /* Style du bouton pour ajouter un nouvel article */
 #addSection button {
     margin-top: 10px;
-    background-color: #3cad5c; /* Green inspired by "Grandir" */
+    background-color: #00d084; /* Bright green inspired by the "Grandir" bubble */
 }
 
 #addSection button:hover {
-    background-color: #318a4c; /* Darker green on hover */
+    background-color: #00a76d; /* Darker green for hover effect */
 }
 
 /* Message d'erreur (si utilisé) */
 #errorMessage {
-    color: #e74c3c; /* Red to stand out */
+    color: #ff5050; /* Bright red for a noticeable error message */
     font-size: 0.9em;
     margin-top: 10px;
 }
