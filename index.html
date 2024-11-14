@@ -25,33 +25,24 @@
     </div>
 
     <!-- Script Firebase et gestion de l'inventaire -->
-   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
-    authDomain: "inventaire-poplab.firebaseapp.com",
-    projectId: "inventaire-poplab",
-    storageBucket: "inventaire-poplab.firebasestorage.app",
-    messagingSenderId: "490095435720",
-    appId: "1:490095435720:web:5df23c49d4938e90086afd",
-    measurementId: "G-KSW6LY3WWN"
-  };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
+            authDomain: "inventaire-poplab.firebaseapp.com",
+            projectId: "inventaire-poplab",
+            storageBucket: "inventaire-poplab.appspot.com",
+            messagingSenderId: "490095435720",
+            appId: "1:490095435720:web:5df23c49d4938e90086afd",
+            measurementId: "G-KSW6LY3WWN"
+        };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        // Fonction pour charger les articles enregistrés
         function loadInventory() {
-            console.log("Chargement de l'inventaire depuis le localStorage...");
             const inventoryDiv = document.getElementById('inventory');
             inventoryDiv.innerHTML = '';
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
@@ -60,7 +51,6 @@
             });
         }
 
-        // Fonction pour créer un élément HTML pour chaque article
         function createItemElement(id, name, quantity) {
             const inventoryDiv = document.getElementById('inventory');
             const itemDiv = document.createElement('div');
@@ -99,7 +89,6 @@
             inventoryDiv.appendChild(itemDiv);
         }
 
-        // Fonction pour ajouter un nouvel article
         async function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) {
@@ -114,23 +103,19 @@
             };
 
             try {
-                console.log("Tentative d'ajout de l'article :", newItem);
                 await setDoc(doc(db, "inventoryItems", newItem.id), newItem);
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 items.push(newItem);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById('newItemName').value = '';
-                console.log("Article ajouté avec succès :", newItem);
             } catch (error) {
                 console.error("Erreur lors de l'ajout de l'article :", error);
             }
         }
 
-        // Fonction pour supprimer un article
         async function removeItem(id) {
             try {
-                console.log("Suppression de l'article avec l'ID :", id);
                 await deleteDoc(doc(db, "inventoryItems", id));
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 const updatedItems = items.filter(item => item.id !== id);
@@ -141,28 +126,9 @@
             }
         }
 
-        // Fonction pour réinitialiser l'inventaire
-        function resetInventory() {
-            console.log("Réinitialisation de l'inventaire...");
-            localStorage.removeItem('inventoryItems');
-            loadInventory();
-        }
+        document.getElementById("addButton").addEventListener("click", addItem);
 
-        // Assignation des événements aux boutons
-        document.getElementById("addButton").addEventListener("click", () => {
-            console.log("Bouton 'Ajouter' cliqué.");
-            addItem();
-        });
-        document.getElementById("resetButton").addEventListener("click", () => {
-            console.log("Bouton 'Réinitialiser' cliqué.");
-            resetInventory();
-        });
-
-        // Charger l'inventaire au démarrage
-        window.addEventListener("load", () => {
-            console.log("Chargement de la page terminé.");
-            loadInventory();
-        });
+        window.addEventListener("load", loadInventory);
     </script>
 </body>
 </html>
