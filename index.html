@@ -25,9 +25,10 @@
         <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
     </div>
 
+    <!-- Script pour initialiser Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         // Configuration Firebase
         const firebaseConfig = {
@@ -44,18 +45,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Rendre `db` accessible globalement
+        window.db = db;
+    </script>
+
+    <!-- Script global pour les fonctions d'inventaire -->
+    <script>
         // Fonction pour charger les articles enregistrés
-        window.loadInventory = function() {
+        function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
             inventoryDiv.innerHTML = '';
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             items.forEach(item => {
                 createItemElement(item.id, item.name, item.quantity);
             });
-        };
+        }
 
         // Fonction pour créer un élément HTML pour chaque article
-        window.createItemElement = function(id, name, quantity) {
+        function createItemElement(id, name, quantity) {
             const inventoryDiv = document.getElementById('inventory');
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item';
@@ -91,10 +98,10 @@
             itemDiv.appendChild(removeButton);
 
             inventoryDiv.appendChild(itemDiv);
-        };
+        }
 
         // Fonction pour ajouter un nouvel article
-        window.addItem = async function() {
+        async function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) return;
 
@@ -105,7 +112,7 @@
             };
 
             try {
-                await setDoc(doc(db, "inventoryItems", newItem.id), newItem);
+                await setDoc(doc(window.db, "inventoryItems", newItem.id), newItem);
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 items.push(newItem);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
@@ -114,12 +121,12 @@
             } catch (error) {
                 console.error("Erreur lors de l'ajout : ", error);
             }
-        };
+        }
 
         // Fonction pour supprimer un article
-        window.removeItem = async function(id) {
+        async function removeItem(id) {
             try {
-                await deleteDoc(doc(db, "inventoryItems", id));
+                await deleteDoc(doc(window.db, "inventoryItems", id));
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 const updatedItems = items.filter(item => item.id !== id);
                 localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
@@ -127,16 +134,16 @@
             } catch (error) {
                 console.error("Erreur lors de la suppression : ", error);
             }
-        };
+        }
 
         // Fonction pour réinitialiser l'inventaire
-        window.resetInventory = function() {
+        function resetInventory() {
             localStorage.removeItem('inventoryItems');
             loadInventory();
-        };
+        }
 
         // Charger l'inventaire au démarrage
-        window.onload = window.loadInventory;
+        window.onload = loadInventory;
     </script>
 </body>
 </html>
