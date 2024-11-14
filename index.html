@@ -30,7 +30,23 @@
     </div>
 
     <script>
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+          import { getFirestore, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+          // Configuration Firebase
+          const firebaseConfig = {
+            apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
+            authDomain: "inventaire-poplab.firebaseapp.com",
+            projectId: "inventaire-poplab",
+            storageBucket: "inventaire-poplab.firebasestorage.app",
+            messagingSenderId: "490095435720",
+            appId: "1:490095435720:web:7ce0713993e42b59086afd",
+            measurementId: "G-19DVTE3W11"
+          };
+
+  // Initialize Firebase and Firestore
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
         // Fonction pour charger les articles enregistrés dans le Local Storage
         function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
@@ -87,19 +103,16 @@
         }
 
         // Fonction pour ajouter un nouvel article
-        function addItem() {
+        async function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) return;
-
-            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const newItem = {
                 id: `item${Date.now()}`,
                 name: newItemName,
                 quantity: 0
             };
-            items.push(newItem);
-            localStorage.setItem('inventoryItems', JSON.stringify(items));
-
+            // Ajouter à Firestore
+            await setDoc(doc(db, "inventoryItems", newItem.id), newItem);
             createItemElement(newItem.id, newItem.name, newItem.quantity);
             document.getElementById('newItemName').value = '';
         }
@@ -127,22 +140,32 @@
         }
 
         // Fonction pour mettre à jour le nom de l'article
-        function updateName(id, newName) {
+        async function updateName(id, newName) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
             if (item) {
                 item.name = newName;
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
+
+                // Mettre à jour le nom dans Firestore
+                await updateDoc(doc(db, "inventoryItems", id), {
+                    name: newName
+                });
             }
         }
 
         // Fonction pour mettre à jour la quantité directement dans le champ de saisie
-        function updateQuantity(id, newQuantity) {
+        async function updateQuantity(id, newQuantity) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
             if (item && newQuantity >= 0) {
                 item.quantity = parseInt(newQuantity);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
+
+                // Mettre à jour la quantité dans Firestore
+                await updateDoc(doc(db, "inventoryItems", id), {
+                    quantity: item.quantity
+                });
             }
         }
 
@@ -153,11 +176,15 @@
         }
 
         // Fonction pour supprimer un article
-        function removeItem(id) {
+        async function removeItem(id) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            const updatedItems = items.filter(item => item.id !== id); // Filtrer l'article à supprimer
-            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems)); // Mettre à jour le Local Storage
-            loadInventory(); // Recharger l'inventaire pour refléter la suppression
+            const updatedItems = items.filter(item => item.id !== id);
+            localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
+
+            // Supprimer de Firestore
+            await deleteDoc(doc(db, "inventoryItems", id));
+
+            loadInventory();
         }
 
     </script>
