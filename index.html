@@ -39,56 +39,8 @@
             measurementId: "G-KSW6LY3WWN"
         };
 
-        // Initialiser Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        function loadInventory() {
-            const inventoryDiv = document.getElementById('inventory');
-            inventoryDiv.innerHTML = '';
-            const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-            items.forEach(item => {
-                createItemElement(item.id, item.name, item.quantity);
-            });
-        }
-
-        function createItemElement(id, name, quantity) {
-            const inventoryDiv = document.getElementById('inventory');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item';
-            itemDiv.id = id;
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.value = name;
-            nameInput.onchange = () => updateName(id, nameInput.value);
-            itemDiv.appendChild(nameInput);
-
-            const decrementButton = document.createElement('button');
-            decrementButton.textContent = '-';
-            decrementButton.onclick = () => decrement(id);
-            itemDiv.appendChild(decrementButton);
-
-            const quantityInput = document.createElement('input');
-            quantityInput.type = 'number';
-            quantityInput.value = quantity;
-            quantityInput.min = 0;
-            quantityInput.className = 'quantity';
-            quantityInput.onchange = () => updateQuantity(id, quantityInput.value);
-            itemDiv.appendChild(quantityInput);
-
-            const incrementButton = document.createElement('button');
-            incrementButton.textContent = '+';
-            incrementButton.onclick = () => increment(id);
-            itemDiv.appendChild(incrementButton);
-
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Supprimer';
-            removeButton.onclick = () => removeItem(id);
-            itemDiv.appendChild(removeButton);
-
-            inventoryDiv.appendChild(itemDiv);
-        }
 
         async function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
@@ -115,21 +67,10 @@
             }
         }
 
-        async function removeItem(id) {
-            try {
-                await deleteDoc(doc(db, "inventoryItems", id));
-                const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
-                const updatedItems = items.filter(item => item.id !== id);
-                localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
-                loadInventory();
-            } catch (error) {
-                console.error("Erreur lors de la suppression :", error);
-            }
-        }
-
-        document.getElementById("addButton").addEventListener("click", addItem);
-
-        window.addEventListener("load", loadInventory);
+        // Assurez-vous que le bouton est lié après que le DOM est chargé
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("addButton").addEventListener("click", addItem);
+        });
     </script>
 </body>
 </html>
