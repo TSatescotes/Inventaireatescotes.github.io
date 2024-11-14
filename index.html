@@ -6,11 +6,11 @@
     <link rel="stylesheet" href="style.css">
     <!-- Charger le script Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <!-- Initialiser Supabase avec les bonnes informations -->
     <script>
+        // Initialiser Supabase en définissant `supabase` dès le début
         const supabaseUrl = 'https://leprhqmbyukywbpgpcmw.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcHJocW1ieXVreXdicGdwY213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1ODM4NDUsImV4cCI6MjA0NzE1OTg0NX0.HvO07RvQgfuEHfAcQX0P7icdnVPAuvEbJUwAMbqYjdI';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey); // Initialisation de Supabase
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
     </script>
 </head>
 <body>
