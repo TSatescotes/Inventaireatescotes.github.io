@@ -43,6 +43,8 @@
         console.log("Firebase initialisé :", firebase.apps.length > 0 ? "Oui" : "Non");
 
         function addItem() {
+            console.log("Fonction addItem appelée"); // Vérifier si addItem est exécutée
+
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) {
                 console.error("Le nom de l'article est vide.");
@@ -55,12 +57,14 @@
                 quantity: 1
             };
 
+            // Ajout dans l'interface pour vérifier l'affichage sans Firestore
+            createItemElement(newItem.id, newItem.name, newItem.quantity);
+            document.getElementById('newItemName').value = ''; // Réinitialiser le champ texte
+
             // Ajout à Firestore avec message de débogage
             db.collection("inventoryItems").doc(newItem.id).set(newItem)
                 .then(() => {
                     console.log("Article ajouté avec succès à Firestore :", newItem);
-                    createItemElement(newItem.id, newItem.name, newItem.quantity);
-                    document.getElementById('newItemName').value = ''; // Réinitialise le champ texte
                 })
                 .catch((error) => {
                     console.error("Erreur lors de l'ajout de l'article dans Firestore :", error);
