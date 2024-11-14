@@ -44,9 +44,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Charger l'inventaire au démarrage
-        window.onload = loadInventory;
-
         // Fonction pour charger les articles enregistrés dans le Local Storage
         window.loadInventory = function() {
             const inventoryDiv = document.getElementById('inventory');
@@ -187,6 +184,9 @@
 
             loadInventory();
         };
+
+        // Charger l'inventaire au démarrage après la définition de toutes les fonctions
+        window.onload = window.loadInventory;
     </script>
 </body>
 </html>
