@@ -21,8 +21,8 @@
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <button onclick="addItem()">Ajouter</button>
-        <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
+        <button id="addButton">Ajouter</button>
+        <button id="resetButton">Réinitialiser l'inventaire</button>
     </div>
 
     <!-- Script pour Firebase et gestion de l'inventaire -->
@@ -136,12 +136,12 @@
             loadInventory();
         }
 
+        // Assignation des événements aux boutons
+        document.getElementById("addButton").addEventListener("click", addItem);
+        document.getElementById("resetButton").addEventListener("click", resetInventory);
+
         // Charger l'inventaire au démarrage
-        window.loadInventory = loadInventory;
-        window.addItem = addItem;
-        window.removeItem = removeItem;
-        window.resetInventory = resetInventory;
-        window.onload = loadInventory;
+        window.addEventListener("load", loadInventory);
     </script>
 </body>
 </html>
