@@ -35,7 +35,7 @@
             apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
             authDomain: "inventaire-poplab.firebaseapp.com",
             projectId: "inventaire-poplab",
-            storageBucket: "inventaire-poplab.firebasestorage.app",
+            storageBucket: "inventaire-poplab.firebaseapp.com",
             messagingSenderId: "490095435720",
             appId: "1:490095435720:web:7ce0713993e42b59086afd",
             measurementId: "G-19DVTE3W11"
@@ -45,8 +45,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        console.log("Firebase initialisé :", db); // Vérifie l'initialisation
+
         // Fonction pour charger les articles enregistrés
         function loadInventory() {
+            console.log("Chargement de l'inventaire depuis le localStorage...");
             const inventoryDiv = document.getElementById('inventory');
             inventoryDiv.innerHTML = '';
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
@@ -125,6 +128,7 @@
         // Fonction pour supprimer un article
         async function removeItem(id) {
             try {
+                console.log("Suppression de l'article avec l'ID :", id);
                 await deleteDoc(doc(db, "inventoryItems", id));
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 const updatedItems = items.filter(item => item.id !== id);
@@ -137,16 +141,26 @@
 
         // Fonction pour réinitialiser l'inventaire
         function resetInventory() {
+            console.log("Réinitialisation de l'inventaire...");
             localStorage.removeItem('inventoryItems');
             loadInventory();
         }
 
         // Assignation des événements aux boutons
-        document.getElementById("addButton").addEventListener("click", addItem);
-        document.getElementById("resetButton").addEventListener("click", resetInventory);
+        document.getElementById("addButton").addEventListener("click", () => {
+            console.log("Bouton 'Ajouter' cliqué.");
+            addItem();
+        });
+        document.getElementById("resetButton").addEventListener("click", () => {
+            console.log("Bouton 'Réinitialiser' cliqué.");
+            resetInventory();
+        });
 
         // Charger l'inventaire au démarrage
-        window.addEventListener("load", loadInventory);
+        window.addEventListener("load", () => {
+            console.log("Chargement de la page terminé.");
+            loadInventory();
+        });
     </script>
 </body>
 </html>
