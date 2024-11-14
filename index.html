@@ -25,12 +25,12 @@
         <button id="resetButton">Réinitialiser l'inventaire</button>
     </div>
 
-    <!-- Script pour Firebase et gestion de l'inventaire -->
+    <!-- Script Firebase et gestion de l'inventaire -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        // Configuration Firebase
+        // Configuration Firebase - Remplacez par vos propres valeurs depuis Firebase Console
         const firebaseConfig = {
             apiKey: "AIzaSyBIFHYleTHOP-Jt-v294VWDkq9a9Udpzbs",
             authDomain: "inventaire-poplab.firebaseapp.com",
@@ -97,7 +97,10 @@
         // Fonction pour ajouter un nouvel article
         async function addItem() {
             const newItemName = document.getElementById('newItemName').value.trim();
-            if (!newItemName) return;
+            if (!newItemName) {
+                console.error("Le nom de l'article est vide.");
+                return;
+            }
 
             const newItem = {
                 id: `item${Date.now()}`,
@@ -106,14 +109,16 @@
             };
 
             try {
+                console.log("Tentative d'ajout de l'article :", newItem);
                 await setDoc(doc(db, "inventoryItems", newItem.id), newItem);
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 items.push(newItem);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById('newItemName').value = '';
+                console.log("Article ajouté avec succès :", newItem);
             } catch (error) {
-                console.error("Erreur lors de l'ajout : ", error);
+                console.error("Erreur lors de l'ajout de l'article :", error);
             }
         }
 
@@ -126,7 +131,7 @@
                 localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
                 loadInventory();
             } catch (error) {
-                console.error("Erreur lors de la suppression : ", error);
+                console.error("Erreur lors de la suppression :", error);
             }
         }
 
