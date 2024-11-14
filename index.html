@@ -21,8 +21,8 @@
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <button onclick="addItem()">Ajouter</button>
-        <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
+        <button onclick="window.addItem()">Ajouter</button>
+        <button onclick="window.resetInventory()">Réinitialiser l'inventaire</button>
     </div>
 
     <script type="module">
@@ -44,8 +44,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Charger l'inventaire au démarrage
+        window.onload = loadInventory;
+
         // Fonction pour charger les articles enregistrés dans le Local Storage
-        function loadInventory() {
+        window.loadInventory = function() {
             const inventoryDiv = document.getElementById('inventory');
             inventoryDiv.innerHTML = ''; // Vider la div pour recharger
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
@@ -53,10 +56,10 @@
             items.forEach(item => {
                 createItemElement(item.id, item.name, item.quantity);
             });
-        }
+        };
 
         // Fonction pour créer un élément d'article dans l'HTML
-        function createItemElement(id, name, quantity) {
+        window.createItemElement = function(id, name, quantity) {
             const inventoryDiv = document.getElementById('inventory');
 
             const itemDiv = document.createElement('div');
@@ -97,10 +100,10 @@
             itemDiv.appendChild(removeButton);
 
             inventoryDiv.appendChild(itemDiv);
-        }
+        };
 
         // Fonction pour ajouter un nouvel article
-        async function addItem() {
+        window.addItem = async function() {
             const newItemName = document.getElementById('newItemName').value.trim();
             if (!newItemName) return;
             const newItem = {
@@ -113,10 +116,10 @@
             await setDoc(doc(db, "inventoryItems", newItem.id), newItem);
             createItemElement(newItem.id, newItem.name, newItem.quantity);
             document.getElementById('newItemName').value = '';
-        }
+        };
 
         // Fonction pour incrémenter la quantité
-        function increment(id) {
+        window.increment = function(id) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
             if (item) {
@@ -124,10 +127,10 @@
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
                 document.querySelector(`#${id} .quantity`).value = item.quantity;
             }
-        }
+        };
 
         // Fonction pour décrémenter la quantité
-        function decrement(id) {
+        window.decrement = function(id) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
             if (item && item.quantity > 0) {
@@ -135,10 +138,10 @@
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
                 document.querySelector(`#${id} .quantity`).value = item.quantity;
             }
-        }
+        };
 
         // Fonction pour mettre à jour le nom de l'article
-        async function updateName(id, newName) {
+        window.updateName = async function(id, newName) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
             if (item) {
@@ -150,10 +153,10 @@
                     name: newName
                 });
             }
-        }
+        };
 
         // Fonction pour mettre à jour la quantité directement dans le champ de saisie
-        async function updateQuantity(id, newQuantity) {
+        window.updateQuantity = async function(id, newQuantity) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const item = items.find(item => item.id === id);
             if (item && newQuantity >= 0) {
@@ -165,16 +168,16 @@
                     quantity: item.quantity
                 });
             }
-        }
+        };
 
         // Fonction pour réinitialiser l'inventaire
-        function resetInventory() {
+        window.resetInventory = function() {
             localStorage.removeItem('inventoryItems');
             loadInventory();
-        }
+        };
 
         // Fonction pour supprimer un article
-        async function removeItem(id) {
+        window.removeItem = async function(id) {
             const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
             const updatedItems = items.filter(item => item.id !== id);
             localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
@@ -183,10 +186,7 @@
             await deleteDoc(doc(db, "inventoryItems", id));
 
             loadInventory();
-        }
-
-        // Charger l'inventaire au démarrage
-        window.onload = loadInventory;
+        };
     </script>
 </body>
 </html>
