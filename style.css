@@ -17,6 +17,8 @@ h1 {
     color: #00b3a3; /* Teal from the "À" bubble */
     margin-top: 20px;
     text-align: center;
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; /* Contour blanc */
+
 }
 
 /* Style des sections */
