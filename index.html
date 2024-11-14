@@ -25,10 +25,10 @@
         <button onclick="resetInventory()">Réinitialiser l'inventaire</button>
     </div>
 
-    <!-- Script pour initialiser Firebase -->
+    <!-- Script pour Firebase et gestion de l'inventaire -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         // Configuration Firebase
         const firebaseConfig = {
@@ -45,16 +45,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Exposer les fonctions Firebase globalement
-        window.db = db;
-        window.setDoc = setDoc;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-        window.updateDoc = updateDoc;
-    </script>
-
-    <!-- Script global pour les fonctions d'inventaire -->
-    <script>
         // Fonction pour charger les articles enregistrés
         function loadInventory() {
             const inventoryDiv = document.getElementById('inventory');
@@ -116,7 +106,7 @@
             };
 
             try {
-                await window.setDoc(window.doc(window.db, "inventoryItems", newItem.id), newItem);
+                await setDoc(doc(db, "inventoryItems", newItem.id), newItem);
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 items.push(newItem);
                 localStorage.setItem('inventoryItems', JSON.stringify(items));
@@ -130,7 +120,7 @@
         // Fonction pour supprimer un article
         async function removeItem(id) {
             try {
-                await window.deleteDoc(window.doc(window.db, "inventoryItems", id));
+                await deleteDoc(doc(db, "inventoryItems", id));
                 const items = JSON.parse(localStorage.getItem('inventoryItems')) || [];
                 const updatedItems = items.filter(item => item.id !== id);
                 localStorage.setItem('inventoryItems', JSON.stringify(updatedItems));
@@ -147,6 +137,10 @@
         }
 
         // Charger l'inventaire au démarrage
+        window.loadInventory = loadInventory;
+        window.addItem = addItem;
+        window.removeItem = removeItem;
+        window.resetInventory = resetInventory;
         window.onload = loadInventory;
     </script>
 </body>
