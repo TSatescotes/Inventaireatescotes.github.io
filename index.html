@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventaire Poplab - Protégé</title>
-    <!-- Inclure bcrypt.js depuis un fichier local -->
-    <script src="./assets/bcrypt.min.js"></script>
+    <!-- Inclure bcrypt.js via jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/bcrypt@5.1.0/bcrypt.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -67,53 +67,27 @@
     </div>
 
     <script>
-        // Configuration JSONBin
-        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
-        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
-
-        // Fonction pour récupérer les données JSONBin
-        async function fetchBinData() {
-            try {
-                const response = await fetch(PASSWORD_BIN_URL, {
-                    method: "GET",
-                    headers: { "X-Access-Key": ACCESS_KEY },
-                });
-                const data = await response.json();
-                return data.record;
-            } catch (error) {
-                console.error("Erreur de récupération des données :", error);
-                return null;
-            }
-        }
-
-        // Fonction pour vérifier le mot de passe
         async function verifyPassword(userInputPassword) {
-            const binData = await fetchBinData();
-            if (!binData) {
-                console.error("Erreur : Impossible de récupérer les données du bin.");
-                return false;
-            }
+            const storedPasswordHash = "$2a$12$tnU1PgyA8b7rkkszzeuJ1OFBUAAujTdOHidifdyP3QM4yd.lwKsvm"; // Haché enregistré
 
-            const storedPasswordHash = binData.password;
             console.log("Haché récupéré :", storedPasswordHash);
             console.log("Mot de passe saisi :", userInputPassword);
 
             try {
-                // Vérifie le mot de passe avec bcrypt.js
-                return bcrypt.compareSync(userInputPassword, storedPasswordHash);
+                const result = bcrypt.compareSync(userInputPassword, storedPasswordHash);
+                console.log("Résultat de la vérification :", result);
+                return result;
             } catch (error) {
                 console.error("Erreur lors de la vérification avec bcrypt :", error);
                 return false;
             }
         }
 
-        // Gestionnaire d'événement pour le bouton de connexion
         document.getElementById("loginButton").addEventListener("click", async () => {
             const userPassword = document.getElementById("passwordInput").value.trim();
             const isPasswordCorrect = await verifyPassword(userPassword);
 
             if (isPasswordCorrect) {
-                const binData = await fetchBinData();
                 document.getElementById("loginForm").style.display = "none";
                 document.getElementById("mainContent").style.display = "block";
             } else {
