@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventaire Poplab - Protégé</title>
+    <!-- Inclure bcrypt.js depuis un fichier local -->
+    <script src="./bcrypt.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #loginForm {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        #mainContent {
+            display: none;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        input, button {
+            display: block;
+            width: calc(100% - 20px);
+            margin: 10px auto;
+            padding: 10px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .errorMessage {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginForm">
+        <h1>Inventaire Poplab</h1>
+        <h2>Connexion</h2>
+        <input type="password" id="passwordInput" placeholder="Entrez le mot de passe">
+        <button id="loginButton">Se connecter</button>
+        <p id="errorMessage" class="errorMessage">Mot de passe incorrect.</p>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <h1>Bienvenue sur l'inventaire</h1>
+        <div id="inventory"></div>
+    </div>
+
+    <script>
+        // Configuration JSONBin
+        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
+        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+
+        // Fonction pour récupérer les données JSONBin
+        async function fetchBinData() {
+            try {
+                const response = await fetch(PASSWORD_BIN_URL, {
+                    method: "GET",
+                    headers: { "X-Access-Key": ACCESS_KEY },
+                });
+                const data = await response.json();
+                return data.record;
+            } catch (error) {
+                console.error("Erreur de récupération des données :", error);
+                return null;
+            }
+        }
+
+        // Fonction pour vérifier le mot de passe
+        async function verifyPassword(userInputPassword) {
+            const binData = await fetchBinData();
+            if (!binData) {
+                console.error("Erreur : Impossible de récupérer les données du bin.");
+                return false;
+            }
+
+            const storedPasswordHash = binData.password;
+            console.log("Haché récupéré :", storedPasswordHash);
+            console.log("Mot de passe saisi :", userInputPassword);
+
+            try {
+                // Vérifie le mot de passe avec bcrypt.js
+                return bcrypt.compareSync(userInputPassword, storedPasswordHash);
+            } catch (error) {
+                console.error("Erreur lors de la vérification avec bcrypt :", error);
+                return false;
+            }
+        }
+
+        // Gestionnaire d'événement pour le bouton de connexion
+        document.getElementById("loginButton").addEventListener("click", async () => {
+            const userPassword = document.getElementById("passwordInput").value.trim();
+            const isPasswordCorrect = await verifyPassword(userPassword);
+
+            if (isPasswordCorrect) {
+                const binData = await fetchBinData();
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("mainContent").style.display = "block";
+            } else {
+                document.getElementById("errorMessage").style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>
