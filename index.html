@@ -84,6 +84,7 @@
         // Configuration JSONBin
         const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
         const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+        const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
 
         let inventory = [];
 
@@ -109,7 +110,7 @@
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-Master-Key": ACCESS_KEY,
+                        "X-Master-Key": MASTER_KEY,
                     },
                     body: JSON.stringify(updatedData),
                 });
