@@ -9,12 +9,20 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7f6;
+            background-color: #ffffff; /* Fond blanc initial */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
             height: 100vh;
+        }
+
+        /* Logo en haut à droite */
+        #logo {
+            position: absolute;
+            top: 20px;
+            right: 150px;
+            width: 100px; /* Ajustez la taille du logo si nécessaire */
         }
 
         h1 {
@@ -121,6 +129,9 @@
     </style>
 </head>
 <body>
+    <!-- Logo en haut à droite -->
+    <img src="votre-logo.png" alt="Logo" id="logo"> <!-- Remplacez "votre-logo.png" par le chemin réel du logo -->
+
     <h1>Inventaire Poplab</h1>
     
     <!-- Section inventaire -->
