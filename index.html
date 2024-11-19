@@ -4,133 +4,124 @@
     <meta charset="UTF-8">
     <title>Inventaire Poplab</title>
     <style>
-        /* Style général pour la page */
+        /* Style général */
         body {
             font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #00b3a3, #ff62a1, #ffef9a); /* Gradient avec teal, rose, et jaune */
+            color: #333; /* Couleur de texte */
             margin: 0;
             padding: 0;
-            background-color: #f4f7f6; /* Fond similaire à l'original */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
+            background-attachment: fixed; /* Garde le gradient fixe lors du scroll */
         }
 
-        /* Logo en haut à droite */
-        #logo {
-            position: absolute;
-            top: 20px;
-            right: 150px;
-            width: 100px; /* Ajustez la taille du logo si nécessaire */
-        }
-
+        /* Style du titre principal */
         h1 {
+            font-size: 3em; /* Augmente la taille du titre */
+            color: #fff; /* Définit la couleur en blanc */
             margin-top: 20px;
-            color: #333;
-        }
-
-        h2 {
-            color: #555;
-        }
-
-        /* Section inventaire */
-        #inventorySection {
-            margin: 20px;
-            width: 80%;
-        }
-
-        /* Section pour ajouter un nouvel article */
-        #addSection {
-            display: flex;
-            flex-direction: column;
-            width: 80%;
-            margin: 20px;
-        }
-
-        input {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-            font-size: 16px;
-        }
-
-        input[type="number"] {
-            width: 70px;
             text-align: center;
+            text-shadow: -2px -2px 0 #333, 2px -2px 0 #333, -2px 2px 0 #333, 2px 2px 0 #333; /* Contour sombre pour contraste */
         }
 
+        /* Style des sections */
+        #inventorySection, #addSection {
+            display: block;
+            background-color: #ffffff; /* Fond blanc pour contraste */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        /* Style des éléments de l'inventaire */
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffef9a; /* Jaune inspiré du texte "Côtés" */
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style des boutons d'incrémentation et de décrémentation */
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
+            background-color: #ff62a1; /* Rose inspiré de la bulle "Sourire" */
+            color: #fff;
             border: none;
             border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.9em;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #e0558b; /* Rose plus foncé pour effet hover */
         }
 
-        /* Style pour les éléments de l'inventaire */
-        .item {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #fafafa;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            justify-content: space-between;
+        button:active {
+            background-color: #c84a78; /* Rose encore plus foncé au clic */
         }
 
-        .item span {
-            flex-grow: 1;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .quantityInput {
-            width: 70px;
-            padding: 10px;
-            font-size: 16px;
+        /* Champ de quantité */
+        .quantity {
+            width: 60px;
             text-align: center;
-            border: 2px solid #ddd;
+            font-size: 1em;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #f8f8f8;
-            transition: all 0.3s ease-in-out;
+            padding: 5px;
+            background-color: #dff0ed; /* Teal doux inspiré de l'ambiance du logo */
         }
 
-        .quantityInput:focus {
-            border-color: #4CAF50;
-            background-color: #e8f5e9;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-        }
-
-        /* Boutons de suppression */
-        .item button {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            font-size: 14px;
-            cursor: pointer;
+        /* Champ de texte pour le nom de l'article */
+        input[type="text"] {
+            width: 60%;
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            margin-right: 10px;
         }
 
-        .item button:hover {
-            background-color: #d32f2f;
+        /* Style pour le logo en haut à droite */
+        .logo {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 150px;
+            height: auto;
+            z-index: 1000;
+        }
+
+        /* Style du bouton pour ajouter un nouvel article */
+        #addSection button {
+            margin-top: 10px;
+            background-color: #00d084; /* Vert vif inspiré de la bulle "Grandir" */
+        }
+
+        #addSection button:hover {
+            background-color: #00a76d; /* Vert plus foncé pour effet hover */
+        }
+
+        /* Message d'erreur (si utilisé) */
+        #errorMessage {
+            color: #ff5050; /* Rouge vif pour message d'erreur */
+            font-size: 0.9em;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <!-- Logo en haut à droite -->
-    <img src="votre-logo.png" alt="Logo" id="logo"> <!-- Remplacez "votre-logo.png" par le chemin réel du logo -->
+    <img src="votre-logo.png" alt="Logo" class="logo"> <!-- Remplacez "votre-logo.png" par le chemin réel du logo -->
 
     <h1>Inventaire Poplab</h1>
     
@@ -214,7 +205,7 @@
                 const quantityInput = document.createElement("input");
                 quantityInput.type = "number";
                 quantityInput.value = quantity;
-                quantityInput.className = "quantityInput";
+                quantityInput.className = "quantity";
                 quantityInput.min = 0;
 
                 // Mise à jour en temps réel
@@ -223,14 +214,6 @@
                 });
 
                 itemDiv.appendChild(quantityInput);
-
-                // Bouton de suppression
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Supprimer";
-                deleteButton.addEventListener("click", () => {
-                    deleteItem(id);
-                });
-                itemDiv.appendChild(deleteButton);
 
                 inventoryDiv.appendChild(itemDiv);
             }
@@ -273,13 +256,6 @@
 
                 item.quantity = Math.max(0, newQuantity); // Empêche quantité négative
                 saveToJsonBin(); // Sauvegarde dans JSONBin
-            }
-
-            // Supprimer un article
-            function deleteItem(id) {
-                inventoryItems = inventoryItems.filter(item => item.id !== id);
-                saveToJsonBin(); // Sauvegarde dans JSONBin
-                loadInventory(); // Recharger l'inventaire
             }
 
             // Événement pour le bouton "Ajouter"
