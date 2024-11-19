@@ -24,10 +24,24 @@
     <!-- Script principal pour gérer l'inventaire -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Stockage local des articles (remplace Supabase)
+            // Stockage local des articles (chargé depuis JSON)
             let inventoryItems = [];
 
-            // Fonction pour charger les articles depuis le stockage local
+            // Fonction pour charger les données initiales depuis le fichier JSON
+            async function loadInitialData() {
+                try {
+                    const response = await fetch('data.json');
+                    if (!response.ok) {
+                        throw new Error('Erreur lors du chargement des données');
+                    }
+                    inventoryItems = await response.json();
+                    loadInventory(); // Charger l'inventaire après avoir récupéré les données
+                } catch (error) {
+                    console.error("Erreur : ", error);
+                }
+            }
+
+            // Fonction pour afficher les articles de l'inventaire
             function loadInventory() {
                 const inventoryDiv = document.getElementById('inventory');
                 inventoryDiv.innerHTML = ''; // Réinitialiser l'affichage
@@ -102,7 +116,9 @@
 
             // Lier l'événement de clic au bouton "Ajouter" une fois le DOM chargé
             document.getElementById("addButton").addEventListener("click", addItem);
-            loadInventory(); // Charger l'inventaire au démarrage
+            
+            // Charger les données initiales
+            loadInitialData();
         });
     </script>
 </body>
