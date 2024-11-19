@@ -4,39 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventaire Poplab - Protégé</title>
-    <link rel="stylesheet" href="style.css"> <!-- Assurez-vous que style.css est présent -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt.js/2.4.3/bcrypt.min.js"></script>
     <style>
+        /* Styles globaux */
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 20px;
+            background-color: #f4f4f4;
         }
         #loginForm, #mainContent {
-            margin: 20px;
-            width: 80%;
-            max-width: 500px;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
         }
-        #mainContent {
-            display: none;
+        input, button {
+            display: block;
+            width: calc(100% - 20px);
+            margin: 10px auto;
+            padding: 10px;
         }
         button {
             background-color: #007BFF;
             color: white;
             border: none;
-            padding: 10px 20px;
-            cursor: pointer;
+            border-radius: 4px;
         }
         button:hover {
             background-color: #0056b3;
-        }
-        input[type="text"], input[type="number"] {
-            padding: 8px;
-            margin: 5px 0;
-            width: 100%;
-            box-sizing: border-box;
         }
         .errorMessage {
             color: red;
@@ -47,8 +46,16 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            border-bottom: 1px solid #ccc;
-            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .inventoryItem input {
+            width: 50px;
+        }
+        .inventoryItem button {
+            background-color: #ff4d4d;
+            border: none;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -56,19 +63,18 @@
     <!-- Formulaire de connexion -->
     <div id="loginForm">
         <h1>Inventaire Poplab</h1>
-        <h2>Accès protégé</h2>
-        <input type="password" id="passwordInput" placeholder="Mot de passe">
+        <h2>Connexion</h2>
+        <input type="password" id="passwordInput" placeholder="Entrez le mot de passe">
         <button id="loginButton">Se connecter</button>
-        <p class="errorMessage" id="errorMessage">Mot de passe incorrect.</p>
+        <p id="errorMessage" class="errorMessage">Mot de passe incorrect.</p>
     </div>
 
-    <!-- Contenu protégé -->
-    <div id="mainContent">
-        <h1>Bienvenue sur l'inventaire Poplab</h1>
-        <h2>Inventaire :</h2>
+    <!-- Contenu principal -->
+    <div id="mainContent" style="display: none;">
+        <h1>Bienvenue sur l'inventaire</h1>
         <div id="inventory"></div>
 
-        <h2>Ajouter un nouvel article :</h2>
+        <h2>Ajouter un article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
         <input type="number" id="newItemQuantity" placeholder="Quantité" min="1">
         <button id="addItemButton">Ajouter</button>
@@ -76,13 +82,12 @@
 
     <script>
         // Configuration JSONBin
-        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6"; // URL de votre bin
-        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW"; // Clé d'accès
-        const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW"; // Clé pour modifier le bin
+        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
+        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
 
         let inventory = [];
 
-        // Fonction pour récupérer les données du bin
+        // Fonction pour récupérer les données JSONBin
         async function fetchBinData() {
             try {
                 const response = await fetch(PASSWORD_BIN_URL, {
@@ -90,9 +95,9 @@
                     headers: { "X-Access-Key": ACCESS_KEY },
                 });
                 const data = await response.json();
-                return data.record; // Retourne les données du bin
+                return data.record;
             } catch (error) {
-                console.error("Erreur lors de la récupération des données :", error);
+                console.error("Erreur de récupération des données :", error);
                 return null;
             }
         }
@@ -104,7 +109,7 @@
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-Master-Key": MASTER_KEY,
+                        "X-Master-Key": ACCESS_KEY,
                     },
                     body: JSON.stringify(updatedData),
                 });
@@ -113,7 +118,16 @@
             }
         }
 
-        // Fonction pour afficher l'inventaire
+        // Vérifie le mot de passe saisi avec bcrypt
+        async function verifyPassword(userInputPassword) {
+            const binData = await fetchBinData();
+            if (!binData) return false;
+
+            const storedPasswordHash = binData.password;
+            return bcrypt.compareSync(userInputPassword, storedPasswordHash);
+        }
+
+        // Affiche l'inventaire
         function displayInventory() {
             const inventoryDiv = document.getElementById("inventory");
             inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
@@ -131,14 +145,14 @@
                 quantityInput.min = 0;
                 quantityInput.addEventListener("change", () => {
                     item.quantity = parseInt(quantityInput.value);
-                    saveBinData({ password: "123456", inventory }); // Sauvegarde
+                    saveBinData({ password: binData.password, inventory });
                 });
 
                 const deleteButton = document.createElement("button");
                 deleteButton.textContent = "Supprimer";
                 deleteButton.addEventListener("click", () => {
                     inventory = inventory.filter((i) => i.id !== item.id);
-                    saveBinData({ password: "123456", inventory }); // Sauvegarde
+                    saveBinData({ password: binData.password, inventory });
                     displayInventory();
                 });
 
@@ -149,7 +163,7 @@
             });
         }
 
-        // Fonction pour ajouter un nouvel article
+        // Ajoute un nouvel article
         function addItem() {
             const newItemName = document.getElementById("newItemName").value.trim();
             const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value);
@@ -159,37 +173,33 @@
                 return;
             }
 
-            const newItem = {
-                id: Date.now(),
-                name: newItemName,
-                quantity: newItemQuantity,
-            };
+            const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
 
             inventory.push(newItem);
-            saveBinData({ password: "123456", inventory }); // Sauvegarde
+            saveBinData({ password: "hashed_password_here", inventory });
             displayInventory();
 
-            // Réinitialise les champs
             document.getElementById("newItemName").value = "";
             document.getElementById("newItemQuantity").value = "";
         }
 
-        // Gestionnaire d'événement pour le bouton de connexion
+        // Gestion de la connexion
         document.getElementById("loginButton").addEventListener("click", async () => {
             const userPassword = document.getElementById("passwordInput").value.trim();
-            const binData = await fetchBinData();
+            const isPasswordCorrect = await verifyPassword(userPassword);
 
-            if (binData && binData.password === userPassword) {
+            if (isPasswordCorrect) {
+                const binData = await fetchBinData();
                 inventory = binData.inventory;
-                document.getElementById("loginForm").style.display = "none"; // Cache le formulaire
-                document.getElementById("mainContent").style.display = "block"; // Affiche le contenu protégé
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("mainContent").style.display = "block";
                 displayInventory();
             } else {
-                document.getElementById("errorMessage").style.display = "block"; // Affiche un message d'erreur
+                document.getElementById("errorMessage").style.display = "block";
             }
         });
 
-        // Gestionnaire d'événement pour le bouton "Ajouter"
+        // Gestion de l'ajout d'article
         document.getElementById("addItemButton").addEventListener("click", addItem);
     </script>
 </body>
