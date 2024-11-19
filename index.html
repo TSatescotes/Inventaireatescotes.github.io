@@ -1,149 +1,68 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Inventaire Poplab</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Inventaire Poplab</h1>
-    
-    <!-- Section inventaire -->
-    <div id="inventorySection">
-        <h2>Inventaire</h2>
-        <div id="inventory"></div>
-    </div>
+document.addEventListener("DOMContentLoaded", function () {
+    const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
+    const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
+    const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+    let inventoryItems = [];
 
-    <!-- Section pour ajouter un nouvel article -->
-    <div id="addSection">
-        <h2>Ajouter un nouvel article</h2>
-        <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <button id="addButton">Ajouter</button>
-    </div>
+    // Charger les données depuis JSONBin
+    async function loadFromJsonBin() {
+        try {
+            const response = await fetch(API_URL, {
+                method: "GET",
+                headers: {
+                    "X-Access-Key": ACCESS_KEY,
+                },
+            });
+            const data = await response.json();
+            inventoryItems = data.record || [];
+            loadInventory(); // Affiche les données dans l'interface
+        } catch (error) {
+            console.error("Erreur lors du chargement des données :", error);
+        }
+    }
 
-    <!-- Script principal pour gérer l'inventaire -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Configuration de l'API JSONBin
-            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
-            const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
-            const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
-            let inventoryItems = [];
+    // Sauvegarder les données dans JSONBin
+    async function saveToJsonBin() {
+        try {
+            await fetch(API_URL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": MASTER_KEY,
+                },
+                body: JSON.stringify(inventoryItems),
+            });
+        } catch (error) {
+            console.error("Erreur lors de la sauvegarde des données :", error);
+        }
+    }
 
-            // Fonction pour charger les données depuis JSONBin
-            async function loadFromJsonBin() {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: "GET",
-                        headers: {
-                            "X-Access-Key": ACCESS_KEY, // Lecture avec Access Key
-                        },
-                    });
-                    const data = await response.json();
-                    inventoryItems = data.record || [];
-                    loadInventory(); // Affiche les données dans l'interface
-                } catch (error) {
-                    console.error("Erreur lors du chargement des données :", error);
-                }
-            }
+    // Afficher les articles dans l'inventaire
+    function loadInventory() {
+        const inventoryDiv = document.getElementById("inventory");
+        inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
 
-            // Fonction pour sauvegarder les données dans JSONBin
-            async function saveToJsonBin() {
-                try {
-                    await fetch(API_URL, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-Master-Key": MASTER_KEY, // Écriture avec Master Key
-                        },
-                        body: JSON.stringify(inventoryItems),
-                    });
-                } catch (error) {
-                    console.error("Erreur lors de la sauvegarde des données :", error);
-                }
-            }
-
-            // Fonction pour afficher les articles de l'inventaire
-            function loadInventory() {
-                const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = ""; // Réinitialiser l'affichage
-
-                inventoryItems.forEach((item) => {
-                    createItemElement(item.id, item.name, item.quantity);
-                });
-            }
-
-            // Fonction pour créer un élément HTML pour chaque article
-            function createItemElement(id, name, quantity) {
-                const inventoryDiv = document.getElementById("inventory");
-                const itemDiv = document.createElement("div");
-                itemDiv.className = "item";
-                itemDiv.id = id;
-
-                const nameDisplay = document.createElement("span");
-                nameDisplay.textContent = name;
-                itemDiv.appendChild(nameDisplay);
-
-                // Bouton pour diminuer la quantité
-                const decrementButton = document.createElement("button");
-                decrementButton.textContent = "-";
-                decrementButton.onclick = () => updateQuantity(id, -1);
-                itemDiv.appendChild(decrementButton);
-
-                // Affichage de la quantité
-                const quantityDisplay = document.createElement("span");
-                quantityDisplay.textContent = ` ${quantity} `;
-                quantityDisplay.className = "quantity";
-                itemDiv.appendChild(quantityDisplay);
-
-                // Bouton pour augmenter la quantité
-                const incrementButton = document.createElement("button");
-                incrementButton.textContent = "+";
-                incrementButton.onclick = () => updateQuantity(id, 1);
-                itemDiv.appendChild(incrementButton);
-
-                inventoryDiv.appendChild(itemDiv);
-            }
-
-            // Fonction pour ajouter un nouvel article
-            function addItem() {
-                const newItemName = document.getElementById("newItemName").value.trim();
-                if (!newItemName) {
-                    alert("Veuillez entrer un nom pour l'article.");
-                    return;
-                }
-
-                const newItem = {
-                    id: Date.now(),
-                    name: newItemName,
-                    quantity: 1,
-                };
-
-                inventoryItems.push(newItem);
-                saveToJsonBin(); // Sauvegarde dans JSONBin
-                createItemElement(newItem.id, newItem.name, newItem.quantity);
-                document.getElementById("newItemName").value = ""; // Réinitialiser le champ texte
-            }
-
-            // Fonction pour mettre à jour la quantité d'un article
-            function updateQuantity(id, change) {
-                const item = inventoryItems.find((item) => item.id === id);
-                if (!item) {
-                    console.error("Article non trouvé");
-                    return;
-                }
-
-                item.quantity = Math.max(0, item.quantity + change); // Empêche quantité négative
-                saveToJsonBin(); // Sauvegarde dans JSONBin
-                loadInventory(); // Recharge l'affichage
-            }
-
-            // Lier les événements à l'interface
-            document.getElementById("addButton").addEventListener("click", addItem);
-
-            // Charger les données au démarrage
-            loadFromJsonBin();
+        inventoryItems.forEach((item) => {
+            createItemElement(item.id, item.name, item.quantity);
         });
-    </script>
-</body>
-</html>
+    }
+
+    // Créer un élément HTML pour chaque article
+    function createItemElement(id, name, quantity) {
+        const inventoryDiv = document.getElementById("inventory");
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "item";
+        itemDiv.id = id;
+
+        const nameDisplay = document.createElement("span");
+        nameDisplay.textContent = name;
+        itemDiv.appendChild(nameDisplay);
+
+        // Champ d'entrée pour modifier la quantité
+        const quantityInput = document.createElement("input");
+        quantityInput.type = "number";
+        quantityInput.value = quantity;
+        quantityInput.className = "quantityInput";
+        quantityInput.min = 0;
+
+        // Sauvegarder la quantité
