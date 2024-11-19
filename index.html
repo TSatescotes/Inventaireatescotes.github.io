@@ -40,7 +40,7 @@
                     });
                     const data = await response.json();
                     inventoryItems = data.record || [];
-                    loadInventory(); // Affiche les données dans l'interface
+                    loadInventory();
                 } catch (error) {
                     console.error("Erreur lors du chargement des données :", error);
                 }
@@ -65,7 +65,7 @@
             // Afficher les articles dans l'inventaire
             function loadInventory() {
                 const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
+                inventoryDiv.innerHTML = "";
 
                 inventoryItems.forEach((item) => {
                     createItemElement(item.id, item.name, item.quantity);
@@ -79,23 +79,35 @@
                 itemDiv.className = "item";
                 itemDiv.id = id;
 
-                const nameDisplay = document.createElement("span");
-                nameDisplay.textContent = name;
-                itemDiv.appendChild(nameDisplay);
+                // Champ pour modifier le nom
+                const nameInput = document.createElement("input");
+                nameInput.type = "text";
+                nameInput.value = name;
+                nameInput.className = "nameInput";
+                nameInput.addEventListener("change", () => {
+                    updateName(id, nameInput.value);
+                });
+                itemDiv.appendChild(nameInput);
 
-                // Champ d'entrée pour modifier la quantité
+                // Champ pour modifier la quantité
                 const quantityInput = document.createElement("input");
                 quantityInput.type = "number";
                 quantityInput.value = quantity;
                 quantityInput.className = "quantityInput";
                 quantityInput.min = 0;
-
-                // Mise à jour en temps réel
                 quantityInput.addEventListener("change", () => {
                     updateQuantity(id, parseInt(quantityInput.value));
                 });
-
                 itemDiv.appendChild(quantityInput);
+
+                // Bouton pour supprimer l'article
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Supprimer";
+                deleteButton.className = "deleteButton";
+                deleteButton.addEventListener("click", () => {
+                    deleteItem(id);
+                });
+                itemDiv.appendChild(deleteButton);
 
                 inventoryDiv.appendChild(itemDiv);
             }
@@ -115,9 +127,21 @@
                 };
 
                 inventoryItems.push(newItem);
-                saveToJsonBin(); // Sauvegarde dans JSONBin
+                saveToJsonBin();
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
-                document.getElementById("newItemName").value = ""; // Réinitialise le champ texte
+                document.getElementById("newItemName").value = "";
+            }
+
+            // Mettre à jour le nom d'un article
+            function updateName(id, newName) {
+                const item = inventoryItems.find((item) => item.id === id);
+                if (!item) {
+                    console.error("Article non trouvé");
+                    return;
+                }
+
+                item.name = newName;
+                saveToJsonBin();
             }
 
             // Mettre à jour la quantité d'un article
@@ -128,11 +152,18 @@
                     return;
                 }
 
-                item.quantity = Math.max(0, newQuantity); // Empêche quantité négative
-                saveToJsonBin(); // Sauvegarde dans JSONBin
+                item.quantity = Math.max(0, newQuantity);
+                saveToJsonBin();
             }
 
-            // Événement pour le bouton "Ajouter"
+            // Supprimer un article
+            function deleteItem(id) {
+                inventoryItems = inventoryItems.filter((item) => item.id !== id);
+                saveToJsonBin();
+                loadInventory(); // Recharge l'affichage
+            }
+
+            // Lier les événements
             document.getElementById("addButton").addEventListener("click", addItem);
 
             // Charger les données au démarrage
