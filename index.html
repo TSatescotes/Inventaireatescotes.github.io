@@ -2,172 +2,84 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Inventaire Poplab</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Page protégée par mot de passe</title>
+    <style>
+        /* Simple style pour centrer le formulaire */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #mainContent {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Inventaire Poplab</h1>
-    
-    <!-- Section inventaire -->
-    <div id="inventorySection">
-        <h2>Inventaire</h2>
-        <div id="inventory"></div>
+    <!-- Formulaire de connexion -->
+    <div id="loginForm">
+        <h2>Accès protégé</h2>
+        <input type="password" id="passwordInput" placeholder="Mot de passe">
+        <button id="loginButton">Se connecter</button>
+        <p id="errorMessage" style="color: red; display: none;">Mot de passe incorrect.</p>
     </div>
 
-    <!-- Section pour ajouter un nouvel article -->
-    <div id="addSection">
-        <h2>Ajouter un nouvel article</h2>
-        <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <button id="addButton">Ajouter</button>
+    <!-- Contenu protégé -->
+    <div id="mainContent">
+        <h1>Bienvenue sur la page protégée</h1>
+        <p>Voici le contenu de la page après authentification.</p>
     </div>
 
-    <!-- Script principal pour gérer l'inventaire -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
-            const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
-            const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
-            let inventoryItems = [];
+        // Configuration JSONBin
+        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6"; // Remplacez par l'URL de votre bin
+        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
 
-            // Charger les données depuis JSONBin
-            async function loadFromJsonBin() {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: "GET",
-                        headers: {
-                            "X-Access-Key": ACCESS_KEY,
-                        },
-                    });
-                    const data = await response.json();
-                    inventoryItems = data.record || [];
-                    loadInventory();
-                } catch (error) {
-                    console.error("Erreur lors du chargement des données :", error);
-                }
-            }
-
-            // Sauvegarder les données dans JSONBin
-            async function saveToJsonBin() {
-                try {
-                    await fetch(API_URL, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-Master-Key": MASTER_KEY,
-                        },
-                        body: JSON.stringify(inventoryItems),
-                    });
-                } catch (error) {
-                    console.error("Erreur lors de la sauvegarde des données :", error);
-                }
-            }
-
-            // Afficher les articles dans l'inventaire
-            function loadInventory() {
-                const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = "";
-
-                inventoryItems.forEach((item) => {
-                    createItemElement(item.id, item.name, item.quantity);
+        // Fonction pour vérifier le mot de passe
+        async function verifyPassword(userInputPassword) {
+            try {
+                const response = await fetch(PASSWORD_BIN_URL, {
+                    method: "GET",
+                    headers: {
+                        "X-Access-Key": ACCESS_KEY,
+                    },
                 });
+                const data = await response.json();
+                const storedPassword = data.record.password;
+
+                return userInputPassword === storedPassword; // Compare le mot de passe utilisateur avec celui du bin
+            } catch (error) {
+                console.error("Erreur lors de la vérification du mot de passe :", error);
+                return false;
             }
+        }
 
-            // Créer un élément HTML pour chaque article
-            function createItemElement(id, name, quantity) {
-                const inventoryDiv = document.getElementById("inventory");
-                const itemDiv = document.createElement("div");
-                itemDiv.className = "item";
-                itemDiv.id = id;
+        // Gestionnaire d'événement pour le bouton de connexion
+        document.getElementById("loginButton").addEventListener("click", async () => {
+            const userPassword = document.getElementById("passwordInput").value.trim();
 
-                // Champ pour modifier le nom
-                const nameInput = document.createElement("input");
-                nameInput.type = "text";
-                nameInput.value = name;
-                nameInput.className = "nameInput";
-                nameInput.addEventListener("change", () => {
-                    updateName(id, nameInput.value);
-                });
-                itemDiv.appendChild(nameInput);
+            // Vérification du mot de passe
+            const isPasswordCorrect = await verifyPassword(userPassword);
 
-                // Champ pour modifier la quantité
-                const quantityInput = document.createElement("input");
-                quantityInput.type = "number";
-                quantityInput.value = quantity;
-                quantityInput.className = "quantityInput";
-                quantityInput.min = 0;
-                quantityInput.addEventListener("change", () => {
-                    updateQuantity(id, parseInt(quantityInput.value));
-                });
-                itemDiv.appendChild(quantityInput);
-
-                // Bouton pour supprimer l'article
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Supprimer";
-                deleteButton.className = "deleteButton";
-                deleteButton.addEventListener("click", () => {
-                    deleteItem(id);
-                });
-                itemDiv.appendChild(deleteButton);
-
-                inventoryDiv.appendChild(itemDiv);
+            if (isPasswordCorrect) {
+                document.getElementById("loginForm").style.display = "none"; // Cache le formulaire
+                document.getElementById("mainContent").style.display = "block"; // Affiche le contenu protégé
+            } else {
+                document.getElementById("errorMessage").style.display = "block"; // Affiche un message d'erreur
             }
-
-            // Ajouter un nouvel article
-            function addItem() {
-                const newItemName = document.getElementById("newItemName").value.trim();
-                if (!newItemName) {
-                    alert("Veuillez entrer un nom pour l'article.");
-                    return;
-                }
-
-                const newItem = {
-                    id: Date.now(),
-                    name: newItemName,
-                    quantity: 1,
-                };
-
-                inventoryItems.push(newItem);
-                saveToJsonBin();
-                createItemElement(newItem.id, newItem.name, newItem.quantity);
-                document.getElementById("newItemName").value = "";
-            }
-
-            // Mettre à jour le nom d'un article
-            function updateName(id, newName) {
-                const item = inventoryItems.find((item) => item.id === id);
-                if (!item) {
-                    console.error("Article non trouvé");
-                    return;
-                }
-
-                item.name = newName;
-                saveToJsonBin();
-            }
-
-            // Mettre à jour la quantité d'un article
-            function updateQuantity(id, newQuantity) {
-                const item = inventoryItems.find((item) => item.id === id);
-                if (!item) {
-                    console.error("Article non trouvé");
-                    return;
-                }
-
-                item.quantity = Math.max(0, newQuantity);
-                saveToJsonBin();
-            }
-
-            // Supprimer un article
-            function deleteItem(id) {
-                inventoryItems = inventoryItems.filter((item) => item.id !== id);
-                saveToJsonBin();
-                loadInventory(); // Recharge l'affichage
-            }
-
-            // Lier les événements
-            document.getElementById("addButton").addEventListener("click", addItem);
-
-            // Charger les données au démarrage
-            loadFromJsonBin();
         });
     </script>
 </body>
