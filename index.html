@@ -2,25 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Page protégée par mot de passe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventaire Poplab - Protégé</title>
+    <link rel="stylesheet" href="style.css"> <!-- Assurez-vous que style.css est présent -->
     <style>
+        /* Ajout de styles temporaires si style.css manque */
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-        }
-        #loginForm {
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #loginForm, #mainContent {
+            margin: 20px;
         }
         #mainContent {
             display: none;
@@ -34,6 +30,7 @@
 <body>
     <!-- Formulaire de connexion -->
     <div id="loginForm">
+        <h1>Inventaire Poplab</h1>
         <h2>Accès protégé</h2>
         <input type="password" id="passwordInput" placeholder="Mot de passe">
         <button id="loginButton">Se connecter</button>
@@ -42,16 +39,15 @@
 
     <!-- Contenu protégé -->
     <div id="mainContent">
-        <h1>Bienvenue sur la page protégée</h1>
-        <p>Voici le contenu de la page après authentification.</p>
+        <h1>Bienvenue sur l'inventaire Poplab</h1>
         <h2>Inventaire :</h2>
         <ul id="inventoryList"></ul>
     </div>
 
     <script>
         // Configuration JSONBin
-        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6"; // Remplacez par l'URL de votre bin
-        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW"; // Clé API d'accès
+        const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6"; // URL de votre bin
+        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW"; // Votre clé d'accès
 
         // Fonction pour récupérer les données du bin JSONBin
         async function fetchBinData() {
@@ -62,8 +58,14 @@
                         "X-Access-Key": ACCESS_KEY,
                     },
                 });
+
+                if (!response.ok) {
+                    console.error("Erreur réseau :", response.status, response.statusText);
+                    return null;
+                }
+
                 const data = await response.json();
-                return data.record; // Retourne l'objet JSON complet
+                return data.record; // Retourne les données stockées dans le bin
             } catch (error) {
                 console.error("Erreur lors de la récupération des données :", error);
                 return null;
@@ -76,7 +78,7 @@
             if (!binData) return false; // Erreur dans la récupération des données
 
             const storedPassword = binData.password;
-            return userInputPassword === storedPassword;
+            return userInputPassword === storedPassword; // Vérifie si les mots de passe correspondent
         }
 
         // Fonction pour afficher l'inventaire
