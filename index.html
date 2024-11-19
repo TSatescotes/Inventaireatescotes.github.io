@@ -3,7 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventaire Poplab</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style général pour la page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        h2 {
+            color: #555;
+        }
+
+        /* Section inventaire */
+        #inventorySection {
+            margin: 20px;
+            width: 80%;
+        }
+
+        /* Section pour ajouter un nouvel article */
+        #addSection {
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            margin: 20px;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Style pour les éléments de l'inventaire */
+        .item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            justify-content: space-between;
+        }
+
+        .item span {
+            flex-grow: 1;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .quantityInput {
+            width: 70px;
+            padding: 10px;
+            font-size: 16px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f8f8;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .quantityInput:focus {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .item button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .item button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 <body>
     <h1>Inventaire Poplab</h1>
