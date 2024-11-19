@@ -18,6 +18,7 @@
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
+        <input type="number" id="newItemQuantity" placeholder="Quantité" min="1">
         <button id="addButton">Ajouter</button>
     </div>
 
@@ -97,27 +98,43 @@
 
                 itemDiv.appendChild(quantityInput);
 
+                // Bouton de suppression
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Supprimer";
+                deleteButton.addEventListener("click", () => {
+                    deleteItem(id);
+                });
+                itemDiv.appendChild(deleteButton);
+
                 inventoryDiv.appendChild(itemDiv);
             }
 
             // Ajouter un nouvel article
             function addItem() {
                 const newItemName = document.getElementById("newItemName").value.trim();
+                const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
+                
                 if (!newItemName) {
                     alert("Veuillez entrer un nom pour l'article.");
+                    return;
+                }
+
+                if (isNaN(newItemQuantity) || newItemQuantity < 1) {
+                    alert("Veuillez entrer une quantité valide.");
                     return;
                 }
 
                 const newItem = {
                     id: Date.now(),
                     name: newItemName,
-                    quantity: 1,
+                    quantity: newItemQuantity,
                 };
 
                 inventoryItems.push(newItem);
                 saveToJsonBin(); // Sauvegarde dans JSONBin
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById("newItemName").value = ""; // Réinitialise le champ texte
+                document.getElementById("newItemQuantity").value = ""; // Réinitialise le champ de quantité
             }
 
             // Mettre à jour la quantité d'un article
@@ -130,6 +147,13 @@
 
                 item.quantity = Math.max(0, newQuantity); // Empêche quantité négative
                 saveToJsonBin(); // Sauvegarde dans JSONBin
+            }
+
+            // Supprimer un article
+            function deleteItem(id) {
+                inventoryItems = inventoryItems.filter(item => item.id !== id);
+                saveToJsonBin(); // Sauvegarde dans JSONBin
+                loadInventory(); // Recharger l'inventaire
             }
 
             // Événement pour le bouton "Ajouter"
