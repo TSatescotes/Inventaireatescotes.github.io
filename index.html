@@ -48,6 +48,26 @@
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Assure que l'élément occupe toute la largeur disponible */
+        }
+
+        /* Champ de quantité */
+        .quantity {
+            width: 80px; /* Une largeur fixe pour que tous les champs aient la même taille */
+            text-align: center;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #dff0ed; /* Teal doux inspiré de l'ambiance du logo */
+        }
+
+        /* Conteneur des éléments à l'intérieur de l'item pour s'assurer que tout est aligné */
+        .item > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
         /* Style des boutons d'incrémentation et de décrémentation */
@@ -68,17 +88,6 @@
 
         button:active {
             background-color: #c84a78; /* Rose encore plus foncé au clic */
-        }
-
-        /* Champ de quantité */
-        .quantity {
-            width: 60px;
-            text-align: center;
-            font-size: 1em;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px;
-            background-color: #dff0ed; /* Teal doux inspiré de l'ambiance du logo */
         }
 
         /* Champ de texte pour le nom de l'article */
