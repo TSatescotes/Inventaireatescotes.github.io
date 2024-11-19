@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventaire Poplab - Protégé</title>
+    <!-- Charger bcrypt.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt.js/2.4.3/bcrypt.min.js"></script>
     <style>
-        /* Styles globaux */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -14,8 +14,17 @@
             padding: 20px;
             background-color: #f4f4f4;
         }
-        #loginForm, #mainContent {
+        #loginForm {
             max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        #mainContent {
+            display: none;
+            max-width: 800px;
             margin: 20px auto;
             padding: 20px;
             border: 1px solid #ddd;
@@ -41,26 +50,9 @@
             color: red;
             display: none;
         }
-        .inventoryItem {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-        }
-        .inventoryItem input {
-            width: 50px;
-        }
-        .inventoryItem button {
-            background-color: #ff4d4d;
-            border: none;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
-    <!-- Formulaire de connexion -->
     <div id="loginForm">
         <h1>Inventaire Poplab</h1>
         <h2>Connexion</h2>
@@ -69,26 +61,15 @@
         <p id="errorMessage" class="errorMessage">Mot de passe incorrect.</p>
     </div>
 
-    <!-- Contenu principal -->
     <div id="mainContent" style="display: none;">
         <h1>Bienvenue sur l'inventaire</h1>
         <div id="inventory"></div>
-
-        <h2>Ajouter un article</h2>
-        <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <input type="number" id="newItemQuantity" placeholder="Quantité" min="1">
-        <button id="addItemButton">Ajouter</button>
     </div>
 
     <script>
-        // Configuration JSONBin
         const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
         const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
-        const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
 
-        let inventory = [];
-
-        // Fonction pour récupérer les données JSONBin
         async function fetchBinData() {
             try {
                 const response = await fetch(PASSWORD_BIN_URL, {
@@ -103,105 +84,38 @@
             }
         }
 
-        // Fonction pour sauvegarder les données dans JSONBin
-        async function saveBinData(updatedData) {
-            try {
-                await fetch(PASSWORD_BIN_URL, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Master-Key": MASTER_KEY,
-                    },
-                    body: JSON.stringify(updatedData),
-                });
-            } catch (error) {
-                console.error("Erreur lors de la sauvegarde des données :", error);
-            }
-        }
-
-        // Vérifie le mot de passe saisi avec bcrypt
         async function verifyPassword(userInputPassword) {
             const binData = await fetchBinData();
-            if (!binData) return false;
-
-            const storedPasswordHash = binData.password;
-            return bcrypt.compareSync(userInputPassword, storedPasswordHash);
-        }
-
-        // Affiche l'inventaire
-        function displayInventory() {
-            const inventoryDiv = document.getElementById("inventory");
-            inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
-
-            inventory.forEach((item) => {
-                const itemDiv = document.createElement("div");
-                itemDiv.className = "inventoryItem";
-
-                const name = document.createElement("span");
-                name.textContent = item.name;
-
-                const quantityInput = document.createElement("input");
-                quantityInput.type = "number";
-                quantityInput.value = item.quantity;
-                quantityInput.min = 0;
-                quantityInput.addEventListener("change", () => {
-                    item.quantity = parseInt(quantityInput.value);
-                    saveBinData({ password: binData.password, inventory });
-                });
-
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Supprimer";
-                deleteButton.addEventListener("click", () => {
-                    inventory = inventory.filter((i) => i.id !== item.id);
-                    saveBinData({ password: binData.password, inventory });
-                    displayInventory();
-                });
-
-                itemDiv.appendChild(name);
-                itemDiv.appendChild(quantityInput);
-                itemDiv.appendChild(deleteButton);
-                inventoryDiv.appendChild(itemDiv);
-            });
-        }
-
-        // Ajoute un nouvel article
-        function addItem() {
-            const newItemName = document.getElementById("newItemName").value.trim();
-            const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value);
-
-            if (!newItemName || isNaN(newItemQuantity) || newItemQuantity <= 0) {
-                alert("Veuillez entrer un nom et une quantité valide.");
-                return;
+            if (!binData) {
+                console.error("Erreur : Impossible de récupérer les données du bin.");
+                return false;
             }
 
-            const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
+            const storedPasswordHash = binData.password;
+            console.log("Haché récupéré :", storedPasswordHash);
+            console.log("Mot de passe saisi :", userInputPassword);
 
-            inventory.push(newItem);
-            saveBinData({ password: "hashed_password_here", inventory });
-            displayInventory();
-
-            document.getElementById("newItemName").value = "";
-            document.getElementById("newItemQuantity").value = "";
+            try {
+                // Vérification avec bcrypt.js
+                return bcrypt.compareSync(userInputPassword, storedPasswordHash);
+            } catch (error) {
+                console.error("Erreur lors de la vérification avec bcrypt :", error);
+                return false;
+            }
         }
 
-        // Gestion de la connexion
         document.getElementById("loginButton").addEventListener("click", async () => {
             const userPassword = document.getElementById("passwordInput").value.trim();
             const isPasswordCorrect = await verifyPassword(userPassword);
 
             if (isPasswordCorrect) {
                 const binData = await fetchBinData();
-                inventory = binData.inventory;
                 document.getElementById("loginForm").style.display = "none";
                 document.getElementById("mainContent").style.display = "block";
-                displayInventory();
             } else {
                 document.getElementById("errorMessage").style.display = "block";
             }
         });
-
-        // Gestion de l'ajout d'article
-        document.getElementById("addItemButton").addEventListener("click", addItem);
     </script>
 </body>
 </html>
