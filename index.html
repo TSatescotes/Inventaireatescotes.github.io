@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Page protégée par mot de passe</title>
     <style>
-        /* Simple style pour centrer le formulaire */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -26,6 +25,10 @@
         #mainContent {
             display: none;
         }
+        #errorMessage {
+            color: red;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -34,22 +37,24 @@
         <h2>Accès protégé</h2>
         <input type="password" id="passwordInput" placeholder="Mot de passe">
         <button id="loginButton">Se connecter</button>
-        <p id="errorMessage" style="color: red; display: none;">Mot de passe incorrect.</p>
+        <p id="errorMessage">Mot de passe incorrect.</p>
     </div>
 
     <!-- Contenu protégé -->
     <div id="mainContent">
         <h1>Bienvenue sur la page protégée</h1>
         <p>Voici le contenu de la page après authentification.</p>
+        <h2>Inventaire :</h2>
+        <ul id="inventoryList"></ul>
     </div>
 
     <script>
         // Configuration JSONBin
         const PASSWORD_BIN_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6"; // Remplacez par l'URL de votre bin
-        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW"; // Clé API d'accès
 
-        // Fonction pour vérifier le mot de passe
-        async function verifyPassword(userInputPassword) {
+        // Fonction pour récupérer les données du bin JSONBin
+        async function fetchBinData() {
             try {
                 const response = await fetch(PASSWORD_BIN_URL, {
                     method: "GET",
@@ -58,13 +63,32 @@
                     },
                 });
                 const data = await response.json();
-                const storedPassword = data.record.password;
-
-                return userInputPassword === storedPassword; // Compare le mot de passe utilisateur avec celui du bin
+                return data.record; // Retourne l'objet JSON complet
             } catch (error) {
-                console.error("Erreur lors de la vérification du mot de passe :", error);
-                return false;
+                console.error("Erreur lors de la récupération des données :", error);
+                return null;
             }
+        }
+
+        // Fonction pour vérifier le mot de passe
+        async function verifyPassword(userInputPassword) {
+            const binData = await fetchBinData();
+            if (!binData) return false; // Erreur dans la récupération des données
+
+            const storedPassword = binData.password;
+            return userInputPassword === storedPassword;
+        }
+
+        // Fonction pour afficher l'inventaire
+        function displayInventory(inventory) {
+            const inventoryList = document.getElementById("inventoryList");
+            inventoryList.innerHTML = ""; // Réinitialise l'affichage
+
+            inventory.forEach((item) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `${item.name} - Quantité : ${item.quantity}`;
+                inventoryList.appendChild(listItem);
+            });
         }
 
         // Gestionnaire d'événement pour le bouton de connexion
@@ -75,10 +99,15 @@
             const isPasswordCorrect = await verifyPassword(userPassword);
 
             if (isPasswordCorrect) {
+                const binData = await fetchBinData(); // Récupère toutes les données
                 document.getElementById("loginForm").style.display = "none"; // Cache le formulaire
                 document.getElementById("mainContent").style.display = "block"; // Affiche le contenu protégé
+
+                // Affiche l'inventaire
+                displayInventory(binData.inventory);
             } else {
-                document.getElementById("errorMessage").style.display = "block"; // Affiche un message d'erreur
+                const errorMessage = document.getElementById("errorMessage");
+                errorMessage.style.display = "block"; // Affiche le message d'erreur
             }
         });
     </script>
