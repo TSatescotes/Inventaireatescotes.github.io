@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventaire Poplab - Protégé</title>
-    <!-- Inclure bcrypt.js via jsDelivr -->
-    <script src="https://cdn.jsdelivr.net/npm/bcrypt@5.1.0/bcrypt.min.js"></script>
+    <!-- Inclure bcryptjs depuis cdnjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,7 +78,7 @@
                 console.log("Résultat de la vérification :", result);
                 return result;
             } catch (error) {
-                console.error("Erreur lors de la vérification avec bcrypt :", error);
+                console.error("Erreur lors de la vérification avec bcryptjs :", error);
                 return false;
             }
         }
