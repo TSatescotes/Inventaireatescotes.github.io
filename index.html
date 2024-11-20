@@ -40,20 +40,20 @@
 
         /* Style des éléments de l'inventaire */
         .item {
-            display: grid; /* Utilisation d'une grille pour aligner les éléments */
-            grid-template-columns: 1fr 100px 120px; /* Colonne pour le nom, quantité et bouton */
+            display: grid;
+            grid-template-columns: 1fr 100px 120px;
             align-items: center;
             background-color: #ffef9a;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            gap: 10px; /* Espacement entre les colonnes */
+            gap: 10px;
         }
 
         /* Champ de quantité */
         .quantity {
-            width: 100%; /* Largeur égale à la colonne définie dans la grille */
+            width: 100%;
             text-align: center;
             font-size: 1em;
             border: 1px solid #ddd;
@@ -113,14 +113,7 @@
             background-color: #00a76d;
         }
 
-        /* Message d'erreur (si utilisé) */
-        #errorMessage {
-            color: #ff5050;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        /* Style de la fenêtre modale */
+        /* Fenêtre modale */
         .modal {
             display: none;
             position: fixed;
@@ -173,7 +166,7 @@
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Fenêtre modale pour confirmation de suppression -->
+    <!-- Fenêtre modale -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <h3>Êtes-vous sûr de vouloir supprimer cet article ?</h3>
@@ -183,22 +176,52 @@
     </div>
 
     <script>
+        const API_URL = "https://api.jsonbin.io/v3/b/673dd78dad19ca34f8cd2cb2/latest";
+        const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
+        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+        let inventoryItems = [];
         let itemToDelete = null;
 
         document.addEventListener("DOMContentLoaded", function () {
-            const inventoryItems = [];
+            async function loadFromJsonBin() {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "GET",
+                        headers: { "X-Access-Key": ACCESS_KEY },
+                    });
+                    if (!response.ok) throw new Error("Erreur de chargement : " + response.status);
+                    const data = await response.json();
+                    inventoryItems = data.record || [];
+                    loadInventory();
+                } catch (error) {
+                    console.error("Erreur lors du chargement des données :", error);
+                }
+            }
 
-            // Afficher les articles dans l'inventaire
+            async function saveToJsonBin() {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Master-Key": MASTER_KEY,
+                        },
+                        body: JSON.stringify({ record: inventoryItems }),
+                    });
+                    if (!response.ok) throw new Error("Erreur de sauvegarde : " + response.status);
+                } catch (error) {
+                    console.error("Erreur lors de la sauvegarde des données :", error);
+                }
+            }
+
             function loadInventory() {
                 const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
-
+                inventoryDiv.innerHTML = "";
                 inventoryItems.forEach((item) => {
                     createItemElement(item.id, item.name, item.quantity);
                 });
             }
 
-            // Créer un élément HTML pour chaque article
             function createItemElement(id, name, quantity) {
                 const inventoryDiv = document.getElementById("inventory");
                 const itemDiv = document.createElement("div");
@@ -208,7 +231,6 @@
                 const nameDisplay = document.createElement("span");
                 nameDisplay.textContent = name;
 
-                // Champ d'entrée pour modifier la quantité
                 const quantityInput = document.createElement("input");
                 quantityInput.type = "number";
                 quantityInput.value = quantity;
@@ -218,9 +240,9 @@
                 quantityInput.addEventListener("change", () => {
                     const item = inventoryItems.find((item) => item.id === id);
                     if (item) item.quantity = parseInt(quantityInput.value) || 0;
+                    saveToJsonBin();
                 });
 
-                // Bouton de suppression
                 const deleteButton = document.createElement("button");
                 deleteButton.textContent = "Supprimer";
                 deleteButton.addEventListener("click", () => {
@@ -231,15 +253,13 @@
                 itemDiv.appendChild(nameDisplay);
                 itemDiv.appendChild(quantityInput);
                 itemDiv.appendChild(deleteButton);
-
                 inventoryDiv.appendChild(itemDiv);
             }
 
-            // Ajouter un nouvel article
             function addItem() {
                 const newItemName = document.getElementById("newItemName").value.trim();
                 const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
-                
+
                 if (!newItemName || isNaN(newItemQuantity) || newItemQuantity < 1) {
                     alert("Veuillez entrer des informations valides.");
                     return;
@@ -247,29 +267,26 @@
 
                 const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
                 inventoryItems.push(newItem);
+                saveToJsonBin();
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById("newItemName").value = "";
                 document.getElementById("newItemQuantity").value = "";
             }
 
-            // Supprimer un article
             function deleteItem() {
-                const index = inventoryItems.findIndex((item) => item.id === itemToDelete);
-                if (index !== -1) inventoryItems.splice(index, 1);
+                inventoryItems = inventoryItems.filter((item) => item.id !== itemToDelete);
+                saveToJsonBin();
                 loadInventory();
                 document.getElementById("myModal").style.display = "none";
             }
 
-            // Événement pour le bouton "Ajouter"
             document.getElementById("addButton").addEventListener("click", addItem);
-
-            // Événements pour la modale
             document.getElementById("confirmDelete").addEventListener("click", deleteItem);
             document.getElementById("cancelDelete").addEventListener("click", () => {
                 document.getElementById("myModal").style.display = "none";
             });
 
-            loadInventory();
+            loadFromJsonBin();
         });
     </script>
 </body>
