@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -172,10 +171,8 @@
     </div>
 
     <script>
-        let itemToDelete = null;
-
         document.addEventListener("DOMContentLoaded", function () {
-            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
+            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6/latest";
             const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
             const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
             let inventoryItems = [];
@@ -188,6 +185,7 @@
                             "X-Access-Key": ACCESS_KEY,
                         },
                     });
+                    if (!response.ok) throw new Error("Erreur de chargement : " + response.status);
                     const data = await response.json();
                     inventoryItems = data.record || [];
                     loadInventory();
@@ -198,7 +196,7 @@
 
             async function saveToJsonBin() {
                 try {
-                    await fetch(API_URL, {
+                    const response = await fetch(API_URL, {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
@@ -206,6 +204,7 @@
                         },
                         body: JSON.stringify({ record: inventoryItems }),
                     });
+                    if (!response.ok) throw new Error("Erreur de sauvegarde : " + response.status);
                 } catch (error) {
                     console.error("Erreur lors de la sauvegarde des données :", error);
                 }
