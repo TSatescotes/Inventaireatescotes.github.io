@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventaire Poplab</title>
+    <link rel="icon" href="data:,"> <!-- Corrige l'erreur de favicon -->
     <style>
         /* Style général */
         body {
@@ -44,24 +45,6 @@
         }
         th {
             background-color: #f9f9f9;
-        }
-        .actions {
-            display: flex;
-            gap: 5px;
-        }
-        .actions button {
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-        .edit {
-            background-color: #ffa500;
-            color: white;
-        }
-        .delete {
-            background-color: #ff4d4d;
-            color: white;
         }
         #addSection button {
             margin-top: 10px;
@@ -136,7 +119,7 @@
                         },
                     });
                     const data = await response.json();
-                    inventoryItems = data.record || [];
+                    inventoryItems = Array.isArray(data.record) ? data.record : []; // Assure que c'est un tableau
                     renderInventory();
                 } catch (error) {
                     console.error("Erreur lors du chargement de l'inventaire :", error);
@@ -176,6 +159,7 @@
                     variants: []
                 };
 
+                if (!Array.isArray(inventoryItems)) inventoryItems = []; // Réinitialise en tableau si besoin
                 inventoryItems.push(newItem);
                 saveInventory();
                 renderInventory();
@@ -195,40 +179,16 @@
 
                     // Quantité
                     const quantityCell = document.createElement("td");
-                    quantityCell.innerHTML = `<input type="number" value="${item.quantity}" min="0" class="quantityInput">`;
+                    quantityCell.textContent = item.quantity;
 
                     // Variantes
                     const variantsCell = document.createElement("td");
-                    if (item.variants.length > 0) {
-                        variantsCell.innerHTML = item.variants.map(variant => `
-                            <div>
-                                ${variant.name} : 
-                                <input type="number" value="${variant.quantity}" min="0" class="variantQuantity">
-                                <button class="delete deleteVariant">Supprimer</button>
-                            </div>
-                        `).join("");
-                    } else {
-                        variantsCell.textContent = "Aucune variante";
-                    }
-                    const addVariantButton = document.createElement("button");
-                    addVariantButton.textContent = "Ajouter une variante";
-                    addVariantButton.classList.add("edit");
-                    addVariantButton.addEventListener("click", () => {
-                        const variantName = prompt("Nom de la variante :");
-                        const variantQuantity = parseInt(prompt("Quantité pour la variante :"), 10);
-                        if (!variantName || isNaN(variantQuantity) || variantQuantity < 0) {
-                            alert("Entrée invalide pour la variante.");
-                            return;
-                        }
-                        item.variants.push({ name: variantName, quantity: variantQuantity });
-                        saveInventory();
-                        renderInventory();
-                    });
-                    variantsCell.appendChild(addVariantButton);
+                    variantsCell.textContent = item.variants.length > 0
+                        ? item.variants.map(variant => `${variant.name}: ${variant.quantity}`).join(", ")
+                        : "Aucune variante";
 
                     // Actions
                     const actionsCell = document.createElement("td");
-                    actionsCell.classList.add("actions");
                     const deleteButton = document.createElement("button");
                     deleteButton.textContent = "Supprimer";
                     deleteButton.classList.add("delete");
@@ -248,27 +208,6 @@
                     row.appendChild(actionsCell);
 
                     inventoryTable.appendChild(row);
-
-                    // Mise à jour des quantités
-                    quantityCell.querySelector(".quantityInput").addEventListener("change", (e) => {
-                        item.quantity = parseInt(e.target.value, 10) || 0;
-                        saveInventory();
-                    });
-
-                    variantsCell.querySelectorAll(".variantQuantity").forEach((variantInput, index) => {
-                        variantInput.addEventListener("change", (e) => {
-                            item.variants[index].quantity = parseInt(e.target.value, 10) || 0;
-                            saveInventory();
-                        });
-                    });
-
-                    variantsCell.querySelectorAll(".deleteVariant").forEach((deleteVariantButton, index) => {
-                        deleteVariantButton.addEventListener("click", () => {
-                            item.variants.splice(index, 1);
-                            saveInventory();
-                            renderInventory();
-                        });
-                    });
                 });
             }
 
