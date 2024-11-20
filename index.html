@@ -144,9 +144,70 @@
         .modal button:hover {
             background-color: #e0558b;
         }
+
+        /* Fenêtre modale de bienvenue */
+        #welcomeModal {
+            display: flex; /* Affiché par défaut */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Fond sombre */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Devant tout */
+            opacity: 1; /* Initialement visible */
+            transition: opacity 1s ease;
+        }
+
+        #welcomeModal.hidden {
+            opacity: 0; /* Transition vers invisible */
+            pointer-events: none; /* Désactive les clics */
+        }
+
+        #welcomeModal .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #welcomeModal .modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #welcomeModal .modal-content button {
+            background: linear-gradient(135deg, #00b3a3, #00d084); /* Dégradé assorti au site */
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #welcomeModal .modal-content button:hover {
+            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
+    <div id="welcomeModal">
+        <div class="modal-content">
+            <h2>Bienvenue dans l'inventaire Poplab</h2>
+            <button id="enterButton">Entrer dans l'inventaire</button>
+        </div>
+    </div>
+
     <img src="Images/logo.png" alt="Logo" class="logo">
     <h1>Inventaire Poplab</h1>
     
@@ -278,6 +339,21 @@
             document.getElementById("confirmDelete").addEventListener("click", deleteItem);
             document.getElementById("cancelDelete").addEventListener("click", () => {
                 document.getElementById("myModal").style.display = "none";
+            });
+
+            // Gestion de la fenêtre de bienvenue
+            const welcomeModal = document.getElementById("welcomeModal");
+            const enterButton = document.getElementById("enterButton");
+            const inventorySection = document.getElementById("inventorySection");
+
+            enterButton.addEventListener("click", () => {
+                welcomeModal.classList.add("hidden"); // Transition pour masquer
+                setTimeout(() => {
+                    welcomeModal.style.display = "none"; // Retire complètement la modale
+                    inventorySection.style.opacity = 0; // Début du fondu
+                    inventorySection.style.transition = "opacity 1s ease"; // Transition du fondu
+                    inventorySection.style.opacity = 1; // Fin du fondu
+                }, 1000); // Correspond à la durée de l'opacité
             });
 
             loadFromJsonBin();
