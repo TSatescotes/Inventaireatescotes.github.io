@@ -1,9 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Inventaire Poplab</title>
-    <link rel="icon" href="data:,"> <!-- Corrige l'erreur de favicon -->
     <style>
         /* Style général */
         body {
@@ -18,7 +18,7 @@
             background-attachment: fixed;
         }
         h1 {
-            font-size: 2.5em;
+            font-size: 3em;
             color: #fff;
             margin-top: 20px;
             text-align: center;
@@ -32,23 +32,65 @@
             padding: 20px;
             margin-top: 20px;
             width: 90%;
-            max-width: 800px;
+            max-width: 600px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            text-align: left;
+        .item {
+            display: grid;
+            grid-template-columns: 1fr 100px 120px;
+            align-items: center;
+            background-color: #ffef9a;
             padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            gap: 10px;
+        }
+        .quantity {
+            width: 100%;
+            text-align: center;
+            font-size: 1em;
             border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #dff0ed;
         }
-        th {
-            background-color: #f9f9f9;
+        .item button {
+            background-color: #ff62a1;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
+        .item button:hover {
+            background-color: #e0558b;
+        }
+        .item button:active {
+            background-color: #c84a78;
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .logo {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 150px;
+            height: auto;
+            z-index: 1000;
+        }
+
+        /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
-            background: linear-gradient(135deg, #00b3a3, #00d084);
+            background: linear-gradient(135deg, #00b3a3, #00d084); /* Gradient de vert à teal */
             color: white;
             font-size: 1.2em;
             font-weight: bold;
@@ -56,61 +98,89 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            transition: all 0.3s ease; /* Transition pour un effet fluide */
         }
+
         #addSection button:hover {
-            background: linear-gradient(135deg, #00a76d, #00b3a3);
+            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
+            transform: scale(1.05); /* Agrandissement léger */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
         }
-        input[type="text"], input[type="number"] {
-            padding: 8px;
-            font-size: 1em;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin: 5px 0;
-            width: calc(100% - 20px);
+
+        #addSection button:active {
+            transform: scale(0.95); /* Réduction légère au clic */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Réduction de l'ombre */
+        }
+
+        #errorMessage {
+            color: #ff5050;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .modal button {
+            margin-top: 10px;
+            background-color: #ff62a1;
+        }
+        .modal button:hover {
+            background-color: #e0558b;
         }
     </style>
 </head>
 <body>
+    <img src="Images/logo.png" alt="Logo" class="logo">
     <h1>Inventaire Poplab</h1>
     
+    <div id="inventorySection">
+        <h2>Inventaire</h2>
+        <div id="inventory"></div>
+    </div>
+
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <input type="number" id="newItemQuantity" placeholder="Quantité" min="0">
+        <input type="number" id="newItemQuantity" placeholder="Quantité" min="1">
         <button id="addButton">Ajouter</button>
     </div>
 
-    <div id="inventorySection">
-        <h2>Inventaire</h2>
-        <table id="inventoryTable">
-            <thead>
-                <tr>
-                    <th>Article</th>
-                    <th>Quantité</th>
-                    <th>Variantes</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Les articles seront ajoutés ici dynamiquement -->
-            </tbody>
-        </table>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <h3>Êtes-vous sûr de vouloir supprimer cet article ?</h3>
+            <button id="confirmDelete">Confirmer</button>
+            <button id="cancelDelete">Annuler</button>
+        </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        let itemToDelete = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
             const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
             const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
             const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
-
             let inventoryItems = [];
-            const inventoryTable = document.getElementById("inventoryTable").querySelector("tbody");
-            const newItemName = document.getElementById("newItemName");
-            const newItemQuantity = document.getElementById("newItemQuantity");
-            const addButton = document.getElementById("addButton");
 
-            // Charger l'inventaire depuis JSONBin
-            async function loadInventory() {
+            async function loadFromJsonBin() {
                 try {
                     const response = await fetch(API_URL, {
                         method: "GET",
@@ -119,15 +189,14 @@
                         },
                     });
                     const data = await response.json();
-                    inventoryItems = Array.isArray(data.record) ? data.record : []; // Assure que c'est un tableau
-                    renderInventory();
+                    inventoryItems = data.record || [];
+                    loadInventory();
                 } catch (error) {
-                    console.error("Erreur lors du chargement de l'inventaire :", error);
+                    console.error("Erreur lors du chargement des données :", error);
                 }
             }
 
-            // Sauvegarder l'inventaire dans JSONBin
-            async function saveInventory() {
+            async function saveToJsonBin() {
                 try {
                     await fetch(API_URL, {
                         method: "PUT",
@@ -138,81 +207,81 @@
                         body: JSON.stringify({ record: inventoryItems }),
                     });
                 } catch (error) {
-                    console.error("Erreur lors de la sauvegarde de l'inventaire :", error);
+                    console.error("Erreur lors de la sauvegarde des données :", error);
                 }
             }
 
-            // Ajout d'un article
-            addButton.addEventListener("click", () => {
-                const itemName = newItemName.value.trim();
-                const itemQuantity = parseInt(newItemQuantity.value.trim(), 10);
-
-                if (!itemName || isNaN(itemQuantity) || itemQuantity < 0) {
-                    alert("Veuillez entrer un nom valide et une quantité.");
-                    return;
-                }
-
-                const newItem = {
-                    id: Date.now(),
-                    name: itemName,
-                    quantity: itemQuantity,
-                    variants: []
-                };
-
-                if (!Array.isArray(inventoryItems)) inventoryItems = []; // Réinitialise en tableau si besoin
-                inventoryItems.push(newItem);
-                saveInventory();
-                renderInventory();
-                newItemName.value = "";
-                newItemQuantity.value = "";
-            });
-
-            // Rendu de l'inventaire
-            function renderInventory() {
-                inventoryTable.innerHTML = "";
-                inventoryItems.forEach(item => {
-                    const row = document.createElement("tr");
-
-                    // Article
-                    const nameCell = document.createElement("td");
-                    nameCell.textContent = item.name;
-
-                    // Quantité
-                    const quantityCell = document.createElement("td");
-                    quantityCell.textContent = item.quantity;
-
-                    // Variantes
-                    const variantsCell = document.createElement("td");
-                    variantsCell.textContent = item.variants.length > 0
-                        ? item.variants.map(variant => `${variant.name}: ${variant.quantity}`).join(", ")
-                        : "Aucune variante";
-
-                    // Actions
-                    const actionsCell = document.createElement("td");
-                    const deleteButton = document.createElement("button");
-                    deleteButton.textContent = "Supprimer";
-                    deleteButton.classList.add("delete");
-                    deleteButton.addEventListener("click", () => {
-                        if (confirm(`Êtes-vous sûr de vouloir supprimer l'article "${item.name}" ?`)) {
-                            inventoryItems = inventoryItems.filter(i => i.id !== item.id);
-                            saveInventory();
-                            renderInventory();
-                        }
-                    });
-                    actionsCell.appendChild(deleteButton);
-
-                    // Append cells to row
-                    row.appendChild(nameCell);
-                    row.appendChild(quantityCell);
-                    row.appendChild(variantsCell);
-                    row.appendChild(actionsCell);
-
-                    inventoryTable.appendChild(row);
+            function loadInventory() {
+                const inventoryDiv = document.getElementById("inventory");
+                inventoryDiv.innerHTML = "";
+                inventoryItems.forEach((item) => {
+                    createItemElement(item.id, item.name, item.quantity);
                 });
             }
 
-            // Charger l'inventaire initialement
-            loadInventory();
+            function createItemElement(id, name, quantity) {
+                const inventoryDiv = document.getElementById("inventory");
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "item";
+                itemDiv.id = id;
+
+                const nameDisplay = document.createElement("span");
+                nameDisplay.textContent = name;
+
+                const quantityInput = document.createElement("input");
+                quantityInput.type = "number";
+                quantityInput.value = quantity;
+                quantityInput.className = "quantity";
+                quantityInput.min = 0;
+                quantityInput.addEventListener("change", () => {
+                    const item = inventoryItems.find((item) => item.id === id);
+                    if (item) item.quantity = parseInt(quantityInput.value) || 0;
+                    saveToJsonBin();
+                });
+
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Supprimer";
+                deleteButton.addEventListener("click", () => {
+                    itemToDelete = id;
+                    document.getElementById("myModal").style.display = "flex";
+                });
+
+                itemDiv.appendChild(nameDisplay);
+                itemDiv.appendChild(quantityInput);
+                itemDiv.appendChild(deleteButton);
+
+                inventoryDiv.appendChild(itemDiv);
+            }
+
+            function addItem() {
+                const newItemName = document.getElementById("newItemName").value.trim();
+                const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
+                if (!newItemName || isNaN(newItemQuantity) || newItemQuantity < 1) {
+                    alert("Veuillez entrer des informations valides.");
+                    return;
+                }
+                const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
+                inventoryItems.push(newItem);
+                saveToJsonBin();
+                createItemElement(newItem.id, newItem.name, newItem.quantity);
+                document.getElementById("newItemName").value = "";
+                document.getElementById("newItemQuantity").value = "";
+            }
+
+            function deleteItem() {
+                inventoryItems = inventoryItems.filter((item) => item.id !== itemToDelete);
+                saveToJsonBin();
+                loadInventory();
+                document.getElementById("myModal").style.display = "none";
+            }
+
+            document.getElementById("addButton").addEventListener("click", addItem);
+            document.getElementById("confirmDelete").addEventListener("click", deleteItem);
+            document.getElementById("cancelDelete").addEventListener("click", () => {
+                document.getElementById("myModal").style.display = "none";
+            });
+
+            loadFromJsonBin();
         });
     </script>
 </body>
