@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Inventaire Poplab</title>
     <style>
-        /* Style général */
+        /* Styles existants (inchangés) */
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #00b3a3, #ff62a1, #ffef9a);
@@ -16,8 +16,6 @@
             align-items: center;
             background-attachment: fixed;
         }
-
-        /* Style du titre principal */
         h1 {
             font-size: 3em;
             color: #fff;
@@ -25,8 +23,6 @@
             text-align: center;
             text-shadow: -2px -2px 0 #333, 2px -2px 0 #333, -2px 2px 0 #333, 2px 2px 0 #333;
         }
-
-        /* Style des sections */
         #inventorySection, #addSection {
             display: block;
             background-color: #ffffff;
@@ -37,23 +33,19 @@
             width: 90%;
             max-width: 600px;
         }
-
-        /* Style des éléments de l'inventaire */
         .item {
-            display: grid; /* Utilisation d'une grille pour aligner les éléments */
-            grid-template-columns: 1fr 100px 120px; /* Colonne pour le nom, quantité et bouton */
+            display: grid;
+            grid-template-columns: 1fr 100px 120px;
             align-items: center;
             background-color: #ffef9a;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            gap: 10px; /* Espacement entre les colonnes */
+            gap: 10px;
         }
-
-        /* Champ de quantité */
         .quantity {
-            width: 100%; /* Largeur égale à la colonne définie dans la grille */
+            width: 100%;
             text-align: center;
             font-size: 1em;
             border: 1px solid #ddd;
@@ -61,8 +53,6 @@
             padding: 5px;
             background-color: #dff0ed;
         }
-
-        /* Boutons dans les éléments */
         .item button {
             background-color: #ff62a1;
             color: #fff;
@@ -73,16 +63,12 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-
         .item button:hover {
             background-color: #e0558b;
         }
-
         .item button:active {
             background-color: #c84a78;
         }
-
-        /* Champ de texte pour le nom de l'article */
         input[type="text"], input[type="number"] {
             width: calc(100% - 20px);
             padding: 8px;
@@ -91,8 +77,6 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
-
-        /* Style pour le logo en haut à droite */
         .logo {
             position: fixed;
             top: 10px;
@@ -101,26 +85,19 @@
             height: auto;
             z-index: 1000;
         }
-
-        /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
             background-color: #00d084;
             width: 100%;
         }
-
         #addSection button:hover {
             background-color: #00a76d;
         }
-
-        /* Message d'erreur (si utilisé) */
         #errorMessage {
             color: #ff5050;
             font-size: 0.9em;
             margin-top: 10px;
         }
-
-        /* Style de la fenêtre modale */
         .modal {
             display: none;
             position: fixed;
@@ -133,7 +110,6 @@
             align-items: center;
             z-index: 999;
         }
-
         .modal-content {
             background-color: white;
             padding: 20px;
@@ -142,30 +118,24 @@
             width: 300px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
         .modal button {
             margin-top: 10px;
             background-color: #ff62a1;
         }
-
         .modal button:hover {
             background-color: #e0558b;
         }
     </style>
 </head>
 <body>
-    <!-- Logo en haut à droite -->
     <img src="Images/logo.png" alt="Logo" class="logo">
-
     <h1>Inventaire Poplab</h1>
     
-    <!-- Section inventaire -->
     <div id="inventorySection">
         <h2>Inventaire</h2>
         <div id="inventory"></div>
     </div>
 
-    <!-- Section pour ajouter un nouvel article -->
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
@@ -173,7 +143,6 @@
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Fenêtre modale pour confirmation de suppression -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <h3>Êtes-vous sûr de vouloir supprimer cet article ?</h3>
@@ -186,19 +155,52 @@
         let itemToDelete = null;
 
         document.addEventListener("DOMContentLoaded", function () {
-            const inventoryItems = [];
+            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
+            const MASTER_KEY = "your-master-key-here"; // Remplacez par votre clé maître
+            const ACCESS_KEY = "your-access-key-here"; // Remplacez par votre clé d'accès
+            let inventoryItems = [];
 
-            // Afficher les articles dans l'inventaire
+            // Charger les données depuis JSONBin
+            async function loadFromJsonBin() {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "GET",
+                        headers: {
+                            "X-Access-Key": ACCESS_KEY,
+                        },
+                    });
+                    const data = await response.json();
+                    inventoryItems = data.record || [];
+                    loadInventory(); // Affiche les données dans l'interface
+                } catch (error) {
+                    console.error("Erreur lors du chargement des données :", error);
+                }
+            }
+
+            // Sauvegarder les données dans JSONBin
+            async function saveToJsonBin() {
+                try {
+                    await fetch(API_URL, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Master-Key": MASTER_KEY,
+                        },
+                        body: JSON.stringify({ record: inventoryItems }),
+                    });
+                } catch (error) {
+                    console.error("Erreur lors de la sauvegarde des données :", error);
+                }
+            }
+
             function loadInventory() {
                 const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
-
+                inventoryDiv.innerHTML = "";
                 inventoryItems.forEach((item) => {
                     createItemElement(item.id, item.name, item.quantity);
                 });
             }
 
-            // Créer un élément HTML pour chaque article
             function createItemElement(id, name, quantity) {
                 const inventoryDiv = document.getElementById("inventory");
                 const itemDiv = document.createElement("div");
@@ -208,19 +210,17 @@
                 const nameDisplay = document.createElement("span");
                 nameDisplay.textContent = name;
 
-                // Champ d'entrée pour modifier la quantité
                 const quantityInput = document.createElement("input");
                 quantityInput.type = "number";
                 quantityInput.value = quantity;
                 quantityInput.className = "quantity";
                 quantityInput.min = 0;
-
                 quantityInput.addEventListener("change", () => {
                     const item = inventoryItems.find((item) => item.id === id);
                     if (item) item.quantity = parseInt(quantityInput.value) || 0;
+                    saveToJsonBin();
                 });
 
-                // Bouton de suppression
                 const deleteButton = document.createElement("button");
                 deleteButton.textContent = "Supprimer";
                 deleteButton.addEventListener("click", () => {
@@ -235,41 +235,35 @@
                 inventoryDiv.appendChild(itemDiv);
             }
 
-            // Ajouter un nouvel article
             function addItem() {
                 const newItemName = document.getElementById("newItemName").value.trim();
                 const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
-                
                 if (!newItemName || isNaN(newItemQuantity) || newItemQuantity < 1) {
                     alert("Veuillez entrer des informations valides.");
                     return;
                 }
-
                 const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
                 inventoryItems.push(newItem);
+                saveToJsonBin();
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById("newItemName").value = "";
                 document.getElementById("newItemQuantity").value = "";
             }
 
-            // Supprimer un article
             function deleteItem() {
-                const index = inventoryItems.findIndex((item) => item.id === itemToDelete);
-                if (index !== -1) inventoryItems.splice(index, 1);
+                inventoryItems = inventoryItems.filter((item) => item.id !== itemToDelete);
+                saveToJsonBin();
                 loadInventory();
                 document.getElementById("myModal").style.display = "none";
             }
 
-            // Événement pour le bouton "Ajouter"
             document.getElementById("addButton").addEventListener("click", addItem);
-
-            // Événements pour la modale
             document.getElementById("confirmDelete").addEventListener("click", deleteItem);
             document.getElementById("cancelDelete").addEventListener("click", () => {
                 document.getElementById("myModal").style.display = "none";
             });
 
-            loadInventory();
+            loadFromJsonBin();
         });
     </script>
 </body>
