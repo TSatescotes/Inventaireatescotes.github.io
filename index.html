@@ -16,6 +16,8 @@
             align-items: center;
             background-attachment: fixed;
         }
+
+        /* Style du titre principal */
         h1 {
             font-size: 3em;
             color: #fff;
@@ -23,6 +25,8 @@
             text-align: center;
             text-shadow: -2px -2px 0 #333, 2px -2px 0 #333, -2px 2px 0 #333, 2px 2px 0 #333;
         }
+
+        /* Style des sections */
         #inventorySection, #addSection {
             display: block;
             background-color: #ffffff;
@@ -33,19 +37,23 @@
             width: 90%;
             max-width: 600px;
         }
+
+        /* Style des éléments de l'inventaire */
         .item {
-            display: grid;
-            grid-template-columns: 1fr 100px 120px;
+            display: grid; /* Utilisation d'une grille pour aligner les éléments */
+            grid-template-columns: 1fr 100px 120px; /* Colonne pour le nom, quantité et bouton */
             align-items: center;
             background-color: #ffef9a;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            gap: 10px;
+            gap: 10px; /* Espacement entre les colonnes */
         }
+
+        /* Champ de quantité */
         .quantity {
-            width: 100%;
+            width: 100%; /* Largeur égale à la colonne définie dans la grille */
             text-align: center;
             font-size: 1em;
             border: 1px solid #ddd;
@@ -53,6 +61,8 @@
             padding: 5px;
             background-color: #dff0ed;
         }
+
+        /* Boutons dans les éléments */
         .item button {
             background-color: #ff62a1;
             color: #fff;
@@ -63,12 +73,16 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         .item button:hover {
             background-color: #e0558b;
         }
+
         .item button:active {
             background-color: #c84a78;
         }
+
+        /* Champ de texte pour le nom de l'article */
         input[type="text"], input[type="number"] {
             width: calc(100% - 20px);
             padding: 8px;
@@ -77,6 +91,8 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
+
+        /* Style pour le logo en haut à droite */
         .logo {
             position: fixed;
             top: 10px;
@@ -89,34 +105,22 @@
         /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
-            background: linear-gradient(135deg, #00b3a3, #00d084); /* Gradient de vert à teal */
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
-            transition: all 0.3s ease; /* Transition pour un effet fluide */
+            background-color: #00d084;
+            width: 100%;
         }
 
         #addSection button:hover {
-            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
-            transform: scale(1.05); /* Agrandissement léger */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
+            background-color: #00a76d;
         }
 
-        #addSection button:active {
-            transform: scale(0.95); /* Réduction légère au clic */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Réduction de l'ombre */
-        }
-
+        /* Message d'erreur (si utilisé) */
         #errorMessage {
             color: #ff5050;
             font-size: 0.9em;
             margin-top: 10px;
         }
+
+        /* Style de la fenêtre modale */
         .modal {
             display: none;
             position: fixed;
@@ -129,6 +133,7 @@
             align-items: center;
             z-index: 999;
         }
+
         .modal-content {
             background-color: white;
             padding: 20px;
@@ -137,85 +142,30 @@
             width: 300px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .modal button {
             margin-top: 10px;
             background-color: #ff62a1;
         }
+
         .modal button:hover {
             background-color: #e0558b;
-        }
-
-        /* Fenêtre modale de bienvenue */
-        #welcomeModal {
-            display: flex; /* Affiché par défaut */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8); /* Fond sombre */
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Devant tout */
-            opacity: 1; /* Initialement visible */
-            transition: opacity 1s ease;
-        }
-
-        #welcomeModal.hidden {
-            opacity: 0; /* Transition vers invisible */
-            pointer-events: none; /* Désactive les clics */
-        }
-
-        #welcomeModal .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        #welcomeModal .modal-content h2 {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        #welcomeModal .modal-content button {
-            background: linear-gradient(135deg, #00b3a3, #00d084); /* Dégradé assorti au site */
-            color: white;
-            font-size: 1em;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        #welcomeModal .modal-content button:hover {
-            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
-            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <div id="welcomeModal">
-        <div class="modal-content">
-            <h2>Bienvenue dans l'inventaire Poplab</h2>
-            <button id="enterButton">Entrer dans l'inventaire</button>
-        </div>
-    </div>
-
+    <!-- Logo en haut à droite -->
     <img src="Images/logo.png" alt="Logo" class="logo">
+
     <h1>Inventaire Poplab</h1>
     
+    <!-- Section inventaire -->
     <div id="inventorySection">
         <h2>Inventaire</h2>
         <div id="inventory"></div>
     </div>
 
+    <!-- Section pour ajouter un nouvel article -->
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
@@ -223,6 +173,7 @@
         <button id="addButton">Ajouter</button>
     </div>
 
+    <!-- Fenêtre modale pour confirmation de suppression -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <h3>Êtes-vous sûr de vouloir supprimer cet article ?</h3>
@@ -235,50 +186,19 @@
         let itemToDelete = null;
 
         document.addEventListener("DOMContentLoaded", function () {
-            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
-            const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
-            const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
-            let inventoryItems = [];
+            const inventoryItems = [];
 
-            async function loadFromJsonBin() {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: "GET",
-                        headers: {
-                            "X-Access-Key": ACCESS_KEY,
-                        },
-                    });
-                    const data = await response.json();
-                    inventoryItems = data.record || [];
-                    loadInventory();
-                } catch (error) {
-                    console.error("Erreur lors du chargement des données :", error);
-                }
-            }
-
-            async function saveToJsonBin() {
-                try {
-                    await fetch(API_URL, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-Master-Key": MASTER_KEY,
-                        },
-                        body: JSON.stringify({ record: inventoryItems }),
-                    });
-                } catch (error) {
-                    console.error("Erreur lors de la sauvegarde des données :", error);
-                }
-            }
-
+            // Afficher les articles dans l'inventaire
             function loadInventory() {
                 const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = "";
+                inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
+
                 inventoryItems.forEach((item) => {
                     createItemElement(item.id, item.name, item.quantity);
                 });
             }
 
+            // Créer un élément HTML pour chaque article
             function createItemElement(id, name, quantity) {
                 const inventoryDiv = document.getElementById("inventory");
                 const itemDiv = document.createElement("div");
@@ -288,17 +208,19 @@
                 const nameDisplay = document.createElement("span");
                 nameDisplay.textContent = name;
 
+                // Champ d'entrée pour modifier la quantité
                 const quantityInput = document.createElement("input");
                 quantityInput.type = "number";
                 quantityInput.value = quantity;
                 quantityInput.className = "quantity";
                 quantityInput.min = 0;
+
                 quantityInput.addEventListener("change", () => {
                     const item = inventoryItems.find((item) => item.id === id);
                     if (item) item.quantity = parseInt(quantityInput.value) || 0;
-                    saveToJsonBin();
                 });
 
+                // Bouton de suppression
                 const deleteButton = document.createElement("button");
                 deleteButton.textContent = "Supprimer";
                 deleteButton.addEventListener("click", () => {
@@ -313,50 +235,41 @@
                 inventoryDiv.appendChild(itemDiv);
             }
 
+            // Ajouter un nouvel article
             function addItem() {
                 const newItemName = document.getElementById("newItemName").value.trim();
                 const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
+                
                 if (!newItemName || isNaN(newItemQuantity) || newItemQuantity < 1) {
                     alert("Veuillez entrer des informations valides.");
                     return;
                 }
+
                 const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
                 inventoryItems.push(newItem);
-                saveToJsonBin();
                 createItemElement(newItem.id, newItem.name, newItem.quantity);
                 document.getElementById("newItemName").value = "";
                 document.getElementById("newItemQuantity").value = "";
             }
 
+            // Supprimer un article
             function deleteItem() {
-                inventoryItems = inventoryItems.filter((item) => item.id !== itemToDelete);
-                saveToJsonBin();
+                const index = inventoryItems.findIndex((item) => item.id === itemToDelete);
+                if (index !== -1) inventoryItems.splice(index, 1);
                 loadInventory();
                 document.getElementById("myModal").style.display = "none";
             }
 
+            // Événement pour le bouton "Ajouter"
             document.getElementById("addButton").addEventListener("click", addItem);
+
+            // Événements pour la modale
             document.getElementById("confirmDelete").addEventListener("click", deleteItem);
             document.getElementById("cancelDelete").addEventListener("click", () => {
                 document.getElementById("myModal").style.display = "none";
             });
 
-            // Gestion de la fenêtre de bienvenue
-            const welcomeModal = document.getElementById("welcomeModal");
-            const enterButton = document.getElementById("enterButton");
-            const inventorySection = document.getElementById("inventorySection");
-
-            enterButton.addEventListener("click", () => {
-                welcomeModal.classList.add("hidden"); // Transition pour masquer
-                setTimeout(() => {
-                    welcomeModal.style.display = "none"; // Retire complètement la modale
-                    inventorySection.style.opacity = 0; // Début du fondu
-                    inventorySection.style.transition = "opacity 1s ease"; // Transition du fondu
-                    inventorySection.style.opacity = 1; // Fin du fondu
-                }, 1000); // Correspond à la durée de l'opacité
-            });
-
-            loadFromJsonBin();
+            loadInventory();
         });
     </script>
 </body>
