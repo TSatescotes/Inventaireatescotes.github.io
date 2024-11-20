@@ -140,8 +140,8 @@
 
     <script>
         const API_URL = "https://api.jsonbin.io/v3/b/673dd78dad19ca34f8cd2cb2/latest";
-        const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
-        const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+        const MASTER_KEY = "$2a$10$BrTwY0EMudslKQBXmQA2G.q40sFPkSQ44c.riid0nla5wU0.PuZoy";
+        const ACCESS_KEY = "$2a$10$LyACMWgz7ZkpGYUpI9QeyespQHVCx4LTxef1UGtPrQwIhf4m11ZyK";
         let inventoryItems = [];
         let itemToDelete = null;
 
@@ -158,6 +158,7 @@
                     loadInventory();
                 } catch (error) {
                     console.error("Erreur lors du chargement des données :", error);
+                    alert("Erreur lors de la connexion à l'inventaire. Veuillez vérifier votre bin JSONBin.");
                 }
             }
 
@@ -174,6 +175,7 @@
                     if (!response.ok) throw new Error("Erreur de sauvegarde : " + response.status);
                 } catch (error) {
                     console.error("Erreur lors de la sauvegarde des données :", error);
+                    alert("Erreur lors de la sauvegarde des données.");
                 }
             }
 
