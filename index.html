@@ -73,8 +73,12 @@
             background-color: #00d084;
             color: white;
         }
-        .addVariant {
-            background-color: #ff62a1;
+        .modifyItem {
+            background-color: #ffa500;
+            color: white;
+        }
+        .deleteItem {
+            background-color: #ff4d4d;
             color: white;
         }
         #addSection button {
@@ -104,8 +108,8 @@
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <button id="addVariantButton">Ajouter une variante</button>
         <div id="variantsList"></div>
+        <button id="addVariantButton">Ajouter une variante</button>
         <button id="addButton">Ajouter</button>
     </div>
 
@@ -117,8 +121,6 @@
             const addVariantButton = document.getElementById("addVariantButton");
             const variantsList = document.getElementById("variantsList");
             const addButton = document.getElementById("addButton");
-
-            let currentVariants = []; // Temporaire pour stocker les variantes
 
             // Ajout d'une variante
             addVariantButton.addEventListener("click", () => {
@@ -170,7 +172,8 @@
                     itemHeader.classList.add("item-header");
                     itemHeader.innerHTML = `
                         <span>${item.name}</span>
-                        <button class="toggleVariants">Voir les variantes</button>`;
+                        <button class="modifyItem">Modifier</button>
+                        <button class="deleteItem">Supprimer</button>`;
                     itemDiv.appendChild(itemHeader);
 
                     // Variantes
@@ -183,6 +186,7 @@
                         variantDiv.innerHTML = `
                             <span>${variant.name}</span>
                             <input type="number" value="${variant.quantity}" class="quantity">
+                            <button onclick="removeVariant('${item.id}', '${variant.name}')">Supprimer</button>
                         `;
                         variantsDiv.appendChild(variantDiv);
                     });
@@ -191,10 +195,46 @@
                     inventoryDiv.appendChild(itemDiv);
 
                     // Interactivité
-                    itemHeader.querySelector(".toggleVariants").addEventListener("click", () => {
-                        variantsDiv.style.display = variantsDiv.style.display === "block" ? "none" : "block";
+                    itemHeader.querySelector(".modifyItem").addEventListener("click", () => {
+                        modifyItem(item.id);
+                    });
+
+                    itemHeader.querySelector(".deleteItem").addEventListener("click", () => {
+                        deleteItem(item.id);
                     });
                 });
+            }
+
+            function modifyItem(id) {
+                const item = inventoryItems.find(i => i.id === id);
+                if (!item) return;
+
+                newItemName.value = item.name;
+                variantsList.innerHTML = "";
+
+                item.variants.forEach(variant => {
+                    const variantHTML = `
+                        <div class="variant">
+                            <input type="text" value="${variant.name}" class="variantName">
+                            <input type="number" value="${variant.quantity}" class="variantQuantity" min="0">
+                        </div>`;
+                    variantsList.insertAdjacentHTML("beforeend", variantHTML);
+                });
+
+                inventoryItems = inventoryItems.filter(i => i.id !== id);
+                renderInventory();
+            }
+
+            function deleteItem(id) {
+                inventoryItems = inventoryItems.filter(i => i.id !== id);
+                renderInventory();
+            }
+
+            function removeVariant(itemId, variantName) {
+                const item = inventoryItems.find(i => i.id === itemId);
+                if (!item) return;
+                item.variants = item.variants.filter(v => v.name !== variantName);
+                renderInventory();
             }
         });
     </script>
