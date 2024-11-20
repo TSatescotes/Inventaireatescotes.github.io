@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Inventaire Poplab</title>
     <style>
-        /* Styles existants (inchangés) */
+        /* Style général */
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #00b3a3, #ff62a1, #ffef9a);
@@ -85,14 +85,33 @@
             height: auto;
             z-index: 1000;
         }
+
+        /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
-            background-color: #00d084;
-            width: 100%;
+            background: linear-gradient(135deg, #00b3a3, #00d084); /* Gradient de vert à teal */
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            transition: all 0.3s ease; /* Transition pour un effet fluide */
         }
+
         #addSection button:hover {
-            background-color: #00a76d;
+            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
+            transform: scale(1.05); /* Agrandissement léger */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
         }
+
+        #addSection button:active {
+            transform: scale(0.95); /* Réduction légère au clic */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Réduction de l'ombre */
+        }
+
         #errorMessage {
             color: #ff5050;
             font-size: 0.9em;
@@ -160,7 +179,6 @@
             const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
             let inventoryItems = [];
 
-            // Charger les données depuis JSONBin
             async function loadFromJsonBin() {
                 try {
                     const response = await fetch(API_URL, {
@@ -171,13 +189,12 @@
                     });
                     const data = await response.json();
                     inventoryItems = data.record || [];
-                    loadInventory(); // Affiche les données dans l'interface
+                    loadInventory();
                 } catch (error) {
                     console.error("Erreur lors du chargement des données :", error);
                 }
             }
 
-            // Sauvegarder les données dans JSONBin
             async function saveToJsonBin() {
                 try {
                     await fetch(API_URL, {
