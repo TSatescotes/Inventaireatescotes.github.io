@@ -40,21 +40,20 @@
 
         /* Style des éléments de l'inventaire */
         .item {
-            display: grid;
-            grid-template-columns: 1fr auto auto;
+            display: grid; /* Utilisation d'une grille pour aligner les éléments */
+            grid-template-columns: 1fr 100px 120px; /* Colonne pour le nom, quantité et bouton */
             align-items: center;
             background-color: #ffef9a;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            gap: 10px;
+            gap: 10px; /* Espacement entre les colonnes */
         }
 
         /* Champ de quantité */
         .quantity {
-            width: 100px;
+            width: 100%; /* Largeur égale à la colonne définie dans la grille */
             text-align: center;
             font-size: 1em;
             border: 1px solid #ddd;
@@ -65,8 +64,6 @@
 
         /* Boutons dans les éléments */
         .item button {
-            width: 100px;
-            text-align: center;
             background-color: #ff62a1;
             color: #fff;
             border: none;
@@ -186,7 +183,94 @@
     </div>
 
     <script>
-        // Ajout des scripts d'inventaire (inchangé depuis la version précédente)
+        let itemToDelete = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const inventoryItems = [];
+
+            // Afficher les articles dans l'inventaire
+            function loadInventory() {
+                const inventoryDiv = document.getElementById("inventory");
+                inventoryDiv.innerHTML = ""; // Réinitialise l'affichage
+
+                inventoryItems.forEach((item) => {
+                    createItemElement(item.id, item.name, item.quantity);
+                });
+            }
+
+            // Créer un élément HTML pour chaque article
+            function createItemElement(id, name, quantity) {
+                const inventoryDiv = document.getElementById("inventory");
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "item";
+                itemDiv.id = id;
+
+                const nameDisplay = document.createElement("span");
+                nameDisplay.textContent = name;
+
+                // Champ d'entrée pour modifier la quantité
+                const quantityInput = document.createElement("input");
+                quantityInput.type = "number";
+                quantityInput.value = quantity;
+                quantityInput.className = "quantity";
+                quantityInput.min = 0;
+
+                quantityInput.addEventListener("change", () => {
+                    const item = inventoryItems.find((item) => item.id === id);
+                    if (item) item.quantity = parseInt(quantityInput.value) || 0;
+                });
+
+                // Bouton de suppression
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Supprimer";
+                deleteButton.addEventListener("click", () => {
+                    itemToDelete = id;
+                    document.getElementById("myModal").style.display = "flex";
+                });
+
+                itemDiv.appendChild(nameDisplay);
+                itemDiv.appendChild(quantityInput);
+                itemDiv.appendChild(deleteButton);
+
+                inventoryDiv.appendChild(itemDiv);
+            }
+
+            // Ajouter un nouvel article
+            function addItem() {
+                const newItemName = document.getElementById("newItemName").value.trim();
+                const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
+                
+                if (!newItemName || isNaN(newItemQuantity) || newItemQuantity < 1) {
+                    alert("Veuillez entrer des informations valides.");
+                    return;
+                }
+
+                const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
+                inventoryItems.push(newItem);
+                createItemElement(newItem.id, newItem.name, newItem.quantity);
+                document.getElementById("newItemName").value = "";
+                document.getElementById("newItemQuantity").value = "";
+            }
+
+            // Supprimer un article
+            function deleteItem() {
+                const index = inventoryItems.findIndex((item) => item.id === itemToDelete);
+                if (index !== -1) inventoryItems.splice(index, 1);
+                loadInventory();
+                document.getElementById("myModal").style.display = "none";
+            }
+
+            // Événement pour le bouton "Ajouter"
+            document.getElementById("addButton").addEventListener("click", addItem);
+
+            // Événements pour la modale
+            document.getElementById("confirmDelete").addEventListener("click", deleteItem);
+            document.getElementById("cancelDelete").addEventListener("click", () => {
+                document.getElementById("myModal").style.display = "none";
+            });
+
+            loadInventory();
+        });
     </script>
 </body>
 </html>
