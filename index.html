@@ -340,12 +340,14 @@
             const welcomeModal = document.getElementById("welcomeModal");
             const enterButton = document.getElementById("enterButton");
             const inventorySection = document.getElementById("inventorySection");
+            const addSection = document.getElementById("addSection");
 
             enterButton.addEventListener("click", () => {
                 welcomeModal.style.opacity = 0; // Transition pour masquer
                 setTimeout(() => {
                     welcomeModal.style.display = "none"; // Retire complètement la modale
                     inventorySection.style.opacity = 1; // Affiche l'inventaire avec un effet de fondu
+                    addSection.style.opacity = 1; // Affiche la section "Ajouter un article" avec le même fondu
                 }, 1000); // Correspond à la durée de l'opacité
             });
 
