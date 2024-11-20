@@ -17,7 +17,7 @@
             background-attachment: fixed;
         }
         h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             color: #fff;
             margin-top: 20px;
             text-align: center;
@@ -31,38 +31,35 @@
             padding: 20px;
             margin-top: 20px;
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
         }
-        .item {
-            display: flex;
-            flex-direction: column;
-            background-color: #ffef9a;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
             padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
         }
-        .item-header {
+        th {
+            background-color: #f9f9f9;
+        }
+        .actions {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 5px;
         }
-        .variant {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        button {
+        .actions button {
             padding: 5px 10px;
             border-radius: 5px;
             border: none;
             cursor: pointer;
         }
-        .modifyItem {
+        .edit {
             background-color: #ffa500;
             color: white;
         }
-        .deleteItem {
+        .delete {
             background-color: #ff4d4d;
             color: white;
         }
@@ -80,44 +77,19 @@
         #addSection button:hover {
             background: linear-gradient(135deg, #00a76d, #00b3a3);
         }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 400px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .modal button {
-            margin-top: 10px;
-            background-color: #00d084;
-            color: white;
-        }
-        .modal button:hover {
-            background-color: #00a76d;
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 5px 0;
+            width: calc(100% - 20px);
         }
     </style>
 </head>
 <body>
     <h1>Inventaire Poplab</h1>
     
-    <div id="inventorySection">
-        <h2>Inventaire</h2>
-        <div id="inventory"></div>
-    </div>
-
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
@@ -125,32 +97,67 @@
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Fenêtre modale pour modification -->
-    <div id="modifyModal" class="modal">
-        <div class="modal-content">
-            <h3>Modifier l'article</h3>
-            <div id="variantList"></div>
-            <button id="addVariantButton">Ajouter une variante</button>
-            <button id="saveChangesButton">Enregistrer</button>
-            <button id="deleteItemButton">Supprimer l'article</button>
-        </div>
+    <div id="inventorySection">
+        <h2>Inventaire</h2>
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Quantité</th>
+                    <th>Variantes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les articles seront ajoutés ici dynamiquement -->
+            </tbody>
+        </table>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
+            const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
+            const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+
             let inventoryItems = [];
-            const inventoryDiv = document.getElementById("inventory");
+            const inventoryTable = document.getElementById("inventoryTable").querySelector("tbody");
             const newItemName = document.getElementById("newItemName");
             const newItemQuantity = document.getElementById("newItemQuantity");
             const addButton = document.getElementById("addButton");
 
-            const modifyModal = document.getElementById("modifyModal");
-            const addVariantButton = document.getElementById("addVariantButton");
-            const saveChangesButton = document.getElementById("saveChangesButton");
-            const deleteItemButton = document.getElementById("deleteItemButton");
-            const variantList = document.getElementById("variantList");
+            // Charger l'inventaire depuis JSONBin
+            async function loadInventory() {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "GET",
+                        headers: {
+                            "X-Access-Key": ACCESS_KEY,
+                        },
+                    });
+                    const data = await response.json();
+                    inventoryItems = data.record || [];
+                    renderInventory();
+                } catch (error) {
+                    console.error("Erreur lors du chargement de l'inventaire :", error);
+                }
+            }
 
-            let currentItemId = null;
+            // Sauvegarder l'inventaire dans JSONBin
+            async function saveInventory() {
+                try {
+                    await fetch(API_URL, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Master-Key": MASTER_KEY,
+                        },
+                        body: JSON.stringify({ record: inventoryItems }),
+                    });
+                } catch (error) {
+                    console.error("Erreur lors de la sauvegarde de l'inventaire :", error);
+                }
+            }
 
             // Ajout d'un article
             addButton.addEventListener("click", () => {
@@ -170,6 +177,7 @@
                 };
 
                 inventoryItems.push(newItem);
+                saveInventory();
                 renderInventory();
                 newItemName.value = "";
                 newItemQuantity.value = "";
@@ -177,75 +185,95 @@
 
             // Rendu de l'inventaire
             function renderInventory() {
-                inventoryDiv.innerHTML = "";
+                inventoryTable.innerHTML = "";
                 inventoryItems.forEach(item => {
-                    const itemDiv = document.createElement("div");
-                    itemDiv.classList.add("item");
+                    const row = document.createElement("tr");
 
-                    const itemHeader = document.createElement("div");
-                    itemHeader.classList.add("item-header");
-                    itemHeader.innerHTML = `
-                        <span>${item.name} (Quantité : ${item.quantity})</span>
-                        <button class="modifyItem">Modifier</button>`;
-                    itemDiv.appendChild(itemHeader);
+                    // Article
+                    const nameCell = document.createElement("td");
+                    nameCell.textContent = item.name;
 
-                    inventoryDiv.appendChild(itemDiv);
+                    // Quantité
+                    const quantityCell = document.createElement("td");
+                    quantityCell.innerHTML = `<input type="number" value="${item.quantity}" min="0" class="quantityInput">`;
 
-                    // Modification de l'article
-                    itemHeader.querySelector(".modifyItem").addEventListener("click", () => {
-                        openModifyModal(item.id);
+                    // Variantes
+                    const variantsCell = document.createElement("td");
+                    if (item.variants.length > 0) {
+                        variantsCell.innerHTML = item.variants.map(variant => `
+                            <div>
+                                ${variant.name} : 
+                                <input type="number" value="${variant.quantity}" min="0" class="variantQuantity">
+                                <button class="delete deleteVariant">Supprimer</button>
+                            </div>
+                        `).join("");
+                    } else {
+                        variantsCell.textContent = "Aucune variante";
+                    }
+                    const addVariantButton = document.createElement("button");
+                    addVariantButton.textContent = "Ajouter une variante";
+                    addVariantButton.classList.add("edit");
+                    addVariantButton.addEventListener("click", () => {
+                        const variantName = prompt("Nom de la variante :");
+                        const variantQuantity = parseInt(prompt("Quantité pour la variante :"), 10);
+                        if (!variantName || isNaN(variantQuantity) || variantQuantity < 0) {
+                            alert("Entrée invalide pour la variante.");
+                            return;
+                        }
+                        item.variants.push({ name: variantName, quantity: variantQuantity });
+                        saveInventory();
+                        renderInventory();
+                    });
+                    variantsCell.appendChild(addVariantButton);
+
+                    // Actions
+                    const actionsCell = document.createElement("td");
+                    actionsCell.classList.add("actions");
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Supprimer";
+                    deleteButton.classList.add("delete");
+                    deleteButton.addEventListener("click", () => {
+                        if (confirm(`Êtes-vous sûr de vouloir supprimer l'article "${item.name}" ?`)) {
+                            inventoryItems = inventoryItems.filter(i => i.id !== item.id);
+                            saveInventory();
+                            renderInventory();
+                        }
+                    });
+                    actionsCell.appendChild(deleteButton);
+
+                    // Append cells to row
+                    row.appendChild(nameCell);
+                    row.appendChild(quantityCell);
+                    row.appendChild(variantsCell);
+                    row.appendChild(actionsCell);
+
+                    inventoryTable.appendChild(row);
+
+                    // Mise à jour des quantités
+                    quantityCell.querySelector(".quantityInput").addEventListener("change", (e) => {
+                        item.quantity = parseInt(e.target.value, 10) || 0;
+                        saveInventory();
+                    });
+
+                    variantsCell.querySelectorAll(".variantQuantity").forEach((variantInput, index) => {
+                        variantInput.addEventListener("change", (e) => {
+                            item.variants[index].quantity = parseInt(e.target.value, 10) || 0;
+                            saveInventory();
+                        });
+                    });
+
+                    variantsCell.querySelectorAll(".deleteVariant").forEach((deleteVariantButton, index) => {
+                        deleteVariantButton.addEventListener("click", () => {
+                            item.variants.splice(index, 1);
+                            saveInventory();
+                            renderInventory();
+                        });
                     });
                 });
             }
 
-            // Ouvre la fenêtre modale de modification
-            function openModifyModal(itemId) {
-                currentItemId = itemId;
-                const currentItem = inventoryItems.find(item => item.id === itemId);
-                if (!currentItem) return;
-
-                variantList.innerHTML = currentItem.variants.map(variant => `
-                    <div class="variant">
-                        <input type="text" value="${variant.name}" class="variantName">
-                        <input type="number" value="${variant.quantity}" class="variantQuantity" min="0">
-                        <button onclick="this.parentElement.remove()">Supprimer</button>
-                    </div>
-                `).join("");
-
-                modifyModal.style.display = "flex";
-            }
-
-            // Ajouter une variante
-            addVariantButton.addEventListener("click", () => {
-                const variantHTML = `
-                    <div class="variant">
-                        <input type="text" placeholder="Nom de la variante" class="variantName">
-                        <input type="number" placeholder="Quantité" class="variantQuantity" min="0">
-                        <button onclick="this.parentElement.remove()">Supprimer</button>
-                    </div>`;
-                variantList.insertAdjacentHTML("beforeend", variantHTML);
-            });
-
-            // Enregistrer les modifications
-            saveChangesButton.addEventListener("click", () => {
-                const currentItem = inventoryItems.find(item => item.id === currentItemId);
-                if (!currentItem) return;
-
-                currentItem.variants = Array.from(variantList.children).map(variantDiv => ({
-                    name: variantDiv.querySelector(".variantName").value.trim(),
-                    quantity: parseInt(variantDiv.querySelector(".variantQuantity").value.trim(), 10) || 0
-                }));
-
-                modifyModal.style.display = "none";
-                renderInventory();
-            });
-
-            // Supprimer un article
-            deleteItemButton.addEventListener("click", () => {
-                inventoryItems = inventoryItems.filter(item => item.id !== currentItemId);
-                modifyModal.style.display = "none";
-                renderInventory();
-            });
+            // Charger l'inventaire initialement
+            loadInventory();
         });
     </script>
 </body>
