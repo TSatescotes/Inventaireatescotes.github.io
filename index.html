@@ -32,66 +32,54 @@
             margin-top: 20px;
             width: 90%;
             max-width: 600px;
-            opacity: 0; /* Caché par défaut */
-            transition: opacity 1s ease; /* Transition pour un effet de fondu */
         }
         .item {
-            display: grid;
-            grid-template-columns: 1fr 100px 120px;
-            align-items: center;
+            display: flex;
+            flex-direction: column;
             background-color: #ffef9a;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            gap: 10px;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .variants {
+            display: none; /* Caché par défaut */
+            margin-top: 10px;
+            padding-left: 10px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #ddd;
+        }
+        .variant {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
         }
         .quantity {
-            width: 100%;
+            width: 50px;
             text-align: center;
-            font-size: 1em;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px;
-            background-color: #dff0ed;
         }
-        .item button {
-            background-color: #ff62a1;
-            color: #fff;
+        button {
+            padding: 5px 10px;
+            border-radius: 5px;
             border: none;
-            border-radius: 5px;
-            padding: 5px;
-            font-size: 0.9em;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        .item button:hover {
-            background-color: #e0558b;
+        .toggleVariants {
+            background-color: #00d084;
+            color: white;
         }
-        .item button:active {
-            background-color: #c84a78;
+        .addVariant {
+            background-color: #ff62a1;
+            color: white;
         }
-        input[type="text"], input[type="number"] {
-            width: calc(100% - 20px);
-            padding: 8px;
-            font-size: 1em;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .logo {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 150px;
-            height: auto;
-            z-index: 1000;
-        }
-
-        /* Style du bouton pour ajouter un nouvel article */
         #addSection button {
             margin-top: 10px;
-            background: linear-gradient(135deg, #00b3a3, #00d084); /* Gradient de vert à teal */
+            background: linear-gradient(135deg, #00b3a3, #00d084);
             color: white;
             font-size: 1.2em;
             font-weight: bold;
@@ -99,111 +87,13 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
-            transition: all 0.3s ease; /* Transition pour un effet fluide */
         }
-
         #addSection button:hover {
-            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
-            transform: scale(1.05); /* Agrandissement léger */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
-        }
-
-        #addSection button:active {
-            transform: scale(0.95); /* Réduction légère au clic */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Réduction de l'ombre */
-        }
-
-        #errorMessage {
-            color: #ff5050;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .modal button {
-            margin-top: 10px;
-            background-color: #ff62a1;
-        }
-        .modal button:hover {
-            background-color: #e0558b;
-        }
-
-        /* Fenêtre modale de bienvenue */
-        #welcomeModal {
-            display: flex; /* Affiché par défaut */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8); /* Fond sombre */
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Devant tout */
-        }
-
-        #welcomeModal .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        #welcomeModal .modal-content h2 {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        #welcomeModal .modal-content button {
-            background: linear-gradient(135deg, #00b3a3, #00d084); /* Dégradé assorti au site */
-            color: white;
-            font-size: 1em;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        #welcomeModal .modal-content button:hover {
-            background: linear-gradient(135deg, #00a76d, #00b3a3); /* Gradient plus foncé */
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #00a76d, #00b3a3);
         }
     </style>
 </head>
 <body>
-    <div id="welcomeModal">
-        <div class="modal-content">
-            <h2>Bienvenue dans l'inventaire Poplab</h2>
-            <button id="enterButton">Entrer dans l'inventaire</button>
-        </div>
-    </div>
-
-    <img src="Images/logo.png" alt="Logo" class="logo">
     <h1>Inventaire Poplab</h1>
     
     <div id="inventorySection">
@@ -214,144 +104,98 @@
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <input type="number" id="newItemQuantity" placeholder="Quantité" min="1">
+        <button id="addVariantButton">Ajouter une variante</button>
+        <div id="variantsList"></div>
         <button id="addButton">Ajouter</button>
     </div>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <h3>Êtes-vous sûr de vouloir supprimer cet article ?</h3>
-            <button id="confirmDelete">Confirmer</button>
-            <button id="cancelDelete">Annuler</button>
-        </div>
-    </div>
-
     <script>
-        let itemToDelete = null;
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const API_URL = "https://api.jsonbin.io/v3/b/673c9a24e41b4d34e456eab6";
-            const MASTER_KEY = "$2a$10$C2IpRYDMnBVS09UziRhWsuPTWBDUAY3bghoT9Fz9cORd/9QFWGhiW";
-            const ACCESS_KEY = "$2a$10$CK7kuKd1eFHbsVtOb88Jbu4vIKYO5oTKnHfu2t0L.vVU2DP/wHcmW";
+        document.addEventListener("DOMContentLoaded", () => {
             let inventoryItems = [];
+            const inventoryDiv = document.getElementById("inventory");
+            const newItemName = document.getElementById("newItemName");
+            const addVariantButton = document.getElementById("addVariantButton");
+            const variantsList = document.getElementById("variantsList");
+            const addButton = document.getElementById("addButton");
 
-            async function loadFromJsonBin() {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: "GET",
-                        headers: {
-                            "X-Access-Key": ACCESS_KEY,
-                        },
-                    });
-                    const data = await response.json();
-                    inventoryItems = data.record || [];
-                    loadInventory();
-                } catch (error) {
-                    console.error("Erreur lors du chargement des données :", error);
-                }
-            }
+            let currentVariants = []; // Temporaire pour stocker les variantes
 
-            async function saveToJsonBin() {
-                try {
-                    await fetch(API_URL, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-Master-Key": MASTER_KEY,
-                        },
-                        body: JSON.stringify({ record: inventoryItems }),
-                    });
-                } catch (error) {
-                    console.error("Erreur lors de la sauvegarde des données :", error);
-                }
-            }
+            // Ajout d'une variante
+            addVariantButton.addEventListener("click", () => {
+                const variantId = Date.now();
+                const variantHTML = `
+                    <div class="variant" id="variant-${variantId}">
+                        <input type="text" placeholder="Nom de la variante (ex: Bleu)" class="variantName">
+                        <input type="number" placeholder="Quantité" class="variantQuantity" min="0">
+                        <button onclick="document.getElementById('variant-${variantId}').remove()">Supprimer</button>
+                    </div>`;
+                variantsList.insertAdjacentHTML("beforeend", variantHTML);
+            });
 
-            function loadInventory() {
-                const inventoryDiv = document.getElementById("inventory");
-                inventoryDiv.innerHTML = "";
-                inventoryItems.forEach((item) => {
-                    createItemElement(item.id, item.name, item.quantity);
-                });
-            }
-
-            function createItemElement(id, name, quantity) {
-                const inventoryDiv = document.getElementById("inventory");
-                const itemDiv = document.createElement("div");
-                itemDiv.className = "item";
-                itemDiv.id = id;
-
-                const nameDisplay = document.createElement("span");
-                nameDisplay.textContent = name;
-
-                const quantityInput = document.createElement("input");
-                quantityInput.type = "number";
-                quantityInput.value = quantity;
-                quantityInput.className = "quantity";
-                quantityInput.min = 0;
-                quantityInput.addEventListener("change", () => {
-                    const item = inventoryItems.find((item) => item.id === id);
-                    if (item) item.quantity = parseInt(quantityInput.value) || 0;
-                    saveToJsonBin();
-                });
-
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Supprimer";
-                deleteButton.addEventListener("click", () => {
-                    itemToDelete = id;
-                    document.getElementById("myModal").style.display = "flex";
-                });
-
-                itemDiv.appendChild(nameDisplay);
-                itemDiv.appendChild(quantityInput);
-                itemDiv.appendChild(deleteButton);
-
-                inventoryDiv.appendChild(itemDiv);
-            }
-
-            function addItem() {
-                const newItemName = document.getElementById("newItemName").value.trim();
-                const newItemQuantity = parseInt(document.getElementById("newItemQuantity").value.trim());
-                if (!newItemName || isNaN(newItemQuantity) || newItemQuantity < 1) {
-                    alert("Veuillez entrer des informations valides.");
+            // Ajout d'un article
+            addButton.addEventListener("click", () => {
+                const itemName = newItemName.value.trim();
+                if (!itemName) {
+                    alert("Veuillez entrer un nom pour l'article.");
                     return;
                 }
-                const newItem = { id: Date.now(), name: newItemName, quantity: newItemQuantity };
+
+                const variants = Array.from(variantsList.children).map(variantDiv => {
+                    const variantName = variantDiv.querySelector(".variantName").value.trim();
+                    const variantQuantity = parseInt(variantDiv.querySelector(".variantQuantity").value.trim(), 10);
+                    return { name: variantName, quantity: variantQuantity };
+                });
+
+                const newItem = {
+                    id: Date.now(),
+                    name: itemName,
+                    variants: variants
+                };
+
                 inventoryItems.push(newItem);
-                saveToJsonBin();
-                createItemElement(newItem.id, newItem.name, newItem.quantity);
-                document.getElementById("newItemName").value = "";
-                document.getElementById("newItemQuantity").value = "";
-            }
-
-            function deleteItem() {
-                inventoryItems = inventoryItems.filter((item) => item.id !== itemToDelete);
-                saveToJsonBin();
-                loadInventory();
-                document.getElementById("myModal").style.display = "none";
-            }
-
-            document.getElementById("addButton").addEventListener("click", addItem);
-            document.getElementById("confirmDelete").addEventListener("click", deleteItem);
-            document.getElementById("cancelDelete").addEventListener("click", () => {
-                document.getElementById("myModal").style.display = "none";
+                renderInventory();
+                newItemName.value = "";
+                variantsList.innerHTML = ""; // Réinitialise les variantes
             });
 
-            // Gestion de la fenêtre de bienvenue
-            const welcomeModal = document.getElementById("welcomeModal");
-            const enterButton = document.getElementById("enterButton");
-            const inventorySection = document.getElementById("inventorySection");
-            const addSection = document.getElementById("addSection");
+            // Rendu de l'inventaire
+            function renderInventory() {
+                inventoryDiv.innerHTML = "";
+                inventoryItems.forEach(item => {
+                    const itemDiv = document.createElement("div");
+                    itemDiv.classList.add("item");
 
-            enterButton.addEventListener("click", () => {
-                welcomeModal.style.opacity = 0; // Transition pour masquer
-                setTimeout(() => {
-                    welcomeModal.style.display = "none"; // Retire complètement la modale
-                    inventorySection.style.opacity = 1; // Affiche l'inventaire avec un effet de fondu
-                    addSection.style.opacity = 1; // Affiche la section "Ajouter un article" avec le même fondu
-                }, 1000); // Correspond à la durée de l'opacité
-            });
+                    // Header
+                    const itemHeader = document.createElement("div");
+                    itemHeader.classList.add("item-header");
+                    itemHeader.innerHTML = `
+                        <span>${item.name}</span>
+                        <button class="toggleVariants">Voir les variantes</button>`;
+                    itemDiv.appendChild(itemHeader);
 
-            loadFromJsonBin();
+                    // Variantes
+                    const variantsDiv = document.createElement("div");
+                    variantsDiv.classList.add("variants");
+
+                    item.variants.forEach(variant => {
+                        const variantDiv = document.createElement("div");
+                        variantDiv.classList.add("variant");
+                        variantDiv.innerHTML = `
+                            <span>${variant.name}</span>
+                            <input type="number" value="${variant.quantity}" class="quantity">
+                        `;
+                        variantsDiv.appendChild(variantDiv);
+                    });
+
+                    itemDiv.appendChild(variantsDiv);
+                    inventoryDiv.appendChild(itemDiv);
+
+                    // Interactivité
+                    itemHeader.querySelector(".toggleVariants").addEventListener("click", () => {
+                        variantsDiv.style.display = variantsDiv.style.display === "block" ? "none" : "block";
+                    });
+                });
+            }
         });
     </script>
 </body>
