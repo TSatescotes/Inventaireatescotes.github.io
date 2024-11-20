@@ -47,21 +47,10 @@
             justify-content: space-between;
             align-items: center;
         }
-        .variants {
-            display: none;
-            margin-top: 10px;
-            padding-left: 10px;
-            background-color: #f9f9f9;
-            border-left: 3px solid #ddd;
-        }
         .variant {
             display: flex;
             justify-content: space-between;
             margin-bottom: 5px;
-        }
-        .quantity {
-            width: 50px;
-            text-align: center;
         }
         button {
             padding: 5px 10px;
@@ -69,8 +58,12 @@
             border: none;
             cursor: pointer;
         }
-        .modifyOrDelete {
+        .modifyItem {
             background-color: #ffa500;
+            color: white;
+        }
+        .deleteItem {
+            background-color: #ff4d4d;
             color: white;
         }
         #addSection button {
@@ -104,16 +97,16 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            width: 300px;
+            width: 400px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .modal button {
             margin-top: 10px;
-            background-color: #ff4d4d;
+            background-color: #00d084;
             color: white;
         }
         .modal button:hover {
-            background-color: #e55;
+            background-color: #00a76d;
         }
     </style>
 </head>
@@ -128,17 +121,18 @@
     <div id="addSection">
         <h2>Ajouter un nouvel article</h2>
         <input type="text" id="newItemName" placeholder="Nom de l'article">
-        <div id="variantsList"></div>
-        <button id="addVariantButton">Ajouter une variante</button>
+        <input type="number" id="newItemQuantity" placeholder="Quantité" min="0">
         <button id="addButton">Ajouter</button>
     </div>
 
-    <!-- Fenêtre modale pour confirmation de suppression -->
-    <div id="deleteModal" class="modal">
+    <!-- Fenêtre modale pour modification -->
+    <div id="modifyModal" class="modal">
         <div class="modal-content">
-            <h3>Êtes-vous sûr de vouloir supprimer cet article ?</h3>
-            <button id="confirmDelete">Confirmer</button>
-            <button id="cancelDelete">Annuler</button>
+            <h3>Modifier l'article</h3>
+            <div id="variantList"></div>
+            <button id="addVariantButton">Ajouter une variante</button>
+            <button id="saveChangesButton">Enregistrer</button>
+            <button id="deleteItemButton">Supprimer l'article</button>
         </div>
     </div>
 
@@ -147,51 +141,38 @@
             let inventoryItems = [];
             const inventoryDiv = document.getElementById("inventory");
             const newItemName = document.getElementById("newItemName");
-            const addVariantButton = document.getElementById("addVariantButton");
-            const variantsList = document.getElementById("variantsList");
+            const newItemQuantity = document.getElementById("newItemQuantity");
             const addButton = document.getElementById("addButton");
 
-            let itemToDelete = null; // Stocke l'ID de l'article à supprimer
-            const deleteModal = document.getElementById("deleteModal");
-            const confirmDeleteButton = document.getElementById("confirmDelete");
-            const cancelDeleteButton = document.getElementById("cancelDelete");
+            const modifyModal = document.getElementById("modifyModal");
+            const addVariantButton = document.getElementById("addVariantButton");
+            const saveChangesButton = document.getElementById("saveChangesButton");
+            const deleteItemButton = document.getElementById("deleteItemButton");
+            const variantList = document.getElementById("variantList");
 
-            // Ajout d'une variante
-            addVariantButton.addEventListener("click", () => {
-                const variantId = Date.now();
-                const variantHTML = `
-                    <div class="variant" id="variant-${variantId}">
-                        <input type="text" placeholder="Nom de la variante (ex: Bleu)" class="variantName">
-                        <input type="number" placeholder="Quantité" class="variantQuantity" min="0">
-                        <button onclick="document.getElementById('variant-${variantId}').remove()">Supprimer</button>
-                    </div>`;
-                variantsList.insertAdjacentHTML("beforeend", variantHTML);
-            });
+            let currentItemId = null;
 
             // Ajout d'un article
             addButton.addEventListener("click", () => {
                 const itemName = newItemName.value.trim();
-                if (!itemName) {
-                    alert("Veuillez entrer un nom pour l'article.");
+                const itemQuantity = parseInt(newItemQuantity.value.trim(), 10);
+
+                if (!itemName || isNaN(itemQuantity) || itemQuantity < 0) {
+                    alert("Veuillez entrer un nom valide et une quantité.");
                     return;
                 }
-
-                const variants = Array.from(variantsList.children).map(variantDiv => {
-                    const variantName = variantDiv.querySelector(".variantName").value.trim();
-                    const variantQuantity = parseInt(variantDiv.querySelector(".variantQuantity").value.trim(), 10) || 0;
-                    return { name: variantName, quantity: variantQuantity };
-                });
 
                 const newItem = {
                     id: Date.now(),
                     name: itemName,
-                    variants: variants
+                    quantity: itemQuantity,
+                    variants: []
                 };
 
                 inventoryItems.push(newItem);
                 renderInventory();
                 newItemName.value = "";
-                variantsList.innerHTML = ""; // Réinitialise les variantes
+                newItemQuantity.value = "";
             });
 
             // Rendu de l'inventaire
@@ -201,73 +182,69 @@
                     const itemDiv = document.createElement("div");
                     itemDiv.classList.add("item");
 
-                    // Header
                     const itemHeader = document.createElement("div");
                     itemHeader.classList.add("item-header");
                     itemHeader.innerHTML = `
-                        <span>${item.name}</span>
-                        <button class="modifyOrDelete">Modifier / Supprimer</button>`;
+                        <span>${item.name} (Quantité : ${item.quantity})</span>
+                        <button class="modifyItem">Modifier</button>`;
                     itemDiv.appendChild(itemHeader);
 
-                    // Variantes
-                    const variantsDiv = document.createElement("div");
-                    variantsDiv.classList.add("variants");
-
-                    item.variants.forEach(variant => {
-                        const variantDiv = document.createElement("div");
-                        variantDiv.classList.add("variant");
-                        variantDiv.innerHTML = `
-                            <span>${variant.name}</span>
-                            <input type="number" value="${variant.quantity}" class="quantity">
-                        `;
-                        variantsDiv.appendChild(variantDiv);
-                    });
-
-                    itemDiv.appendChild(variantsDiv);
                     inventoryDiv.appendChild(itemDiv);
 
-                    // Interactivité pour modifier ou supprimer
-                    itemHeader.querySelector(".modifyOrDelete").addEventListener("click", () => {
-                        if (confirm("Voulez-vous modifier cet article ?")) {
-                            modifyItem(item.id);
-                        } else {
-                            itemToDelete = item.id;
-                            deleteModal.style.display = "flex";
-                        }
+                    // Modification de l'article
+                    itemHeader.querySelector(".modifyItem").addEventListener("click", () => {
+                        openModifyModal(item.id);
                     });
                 });
             }
 
-            // Modification d'un article
-            function modifyItem(id) {
-                const item = inventoryItems.find(i => i.id === id);
-                if (!item) return;
+            // Ouvre la fenêtre modale de modification
+            function openModifyModal(itemId) {
+                currentItemId = itemId;
+                const currentItem = inventoryItems.find(item => item.id === itemId);
+                if (!currentItem) return;
 
-                newItemName.value = item.name;
-                variantsList.innerHTML = "";
+                variantList.innerHTML = currentItem.variants.map(variant => `
+                    <div class="variant">
+                        <input type="text" value="${variant.name}" class="variantName">
+                        <input type="number" value="${variant.quantity}" class="variantQuantity" min="0">
+                        <button onclick="this.parentElement.remove()">Supprimer</button>
+                    </div>
+                `).join("");
 
-                item.variants.forEach(variant => {
-                    const variantHTML = `
-                        <div class="variant">
-                            <input type="text" value="${variant.name}" class="variantName">
-                            <input type="number" value="${variant.quantity}" class="variantQuantity" min="0">
-                        </div>`;
-                    variantsList.insertAdjacentHTML("beforeend", variantHTML);
-                });
-
-                inventoryItems = inventoryItems.filter(i => i.id !== id);
-                renderInventory();
+                modifyModal.style.display = "flex";
             }
 
-            // Suppression d'un article
-            confirmDeleteButton.addEventListener("click", () => {
-                inventoryItems = inventoryItems.filter(i => i.id !== itemToDelete);
-                deleteModal.style.display = "none";
+            // Ajouter une variante
+            addVariantButton.addEventListener("click", () => {
+                const variantHTML = `
+                    <div class="variant">
+                        <input type="text" placeholder="Nom de la variante" class="variantName">
+                        <input type="number" placeholder="Quantité" class="variantQuantity" min="0">
+                        <button onclick="this.parentElement.remove()">Supprimer</button>
+                    </div>`;
+                variantList.insertAdjacentHTML("beforeend", variantHTML);
+            });
+
+            // Enregistrer les modifications
+            saveChangesButton.addEventListener("click", () => {
+                const currentItem = inventoryItems.find(item => item.id === currentItemId);
+                if (!currentItem) return;
+
+                currentItem.variants = Array.from(variantList.children).map(variantDiv => ({
+                    name: variantDiv.querySelector(".variantName").value.trim(),
+                    quantity: parseInt(variantDiv.querySelector(".variantQuantity").value.trim(), 10) || 0
+                }));
+
+                modifyModal.style.display = "none";
                 renderInventory();
             });
 
-            cancelDeleteButton.addEventListener("click", () => {
-                deleteModal.style.display = "none";
+            // Supprimer un article
+            deleteItemButton.addEventListener("click", () => {
+                inventoryItems = inventoryItems.filter(item => item.id !== currentItemId);
+                modifyModal.style.display = "none";
+                renderInventory();
             });
         });
     </script>
